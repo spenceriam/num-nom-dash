@@ -1,3 +1,4 @@
+
 import { GameLevel } from "./types";
 import { generateRandomMaze, generateEasyMaze } from "./utils";
 
@@ -28,10 +29,21 @@ const rules = {
     description: "Collect all numbers less than 50",
     isMatch: (num: number) => num < 50
   },
-  equalsTo42: {
-    name: "Equal to 42",
-    description: "Collect all numbers equal to 42",
-    isMatch: (num: number) => num === 42
+  sumEquals10: {
+    name: "Sum Equals 10",
+    description: "Collect all numbers that add up to 10 (e.g., 1+9, 2+8)",
+    isMatch: (num: number) => {
+      const digits = num.toString().split('').map(Number);
+      return digits.reduce((sum, digit) => sum + digit, 0) === 10;
+    }
+  },
+  perfectSquares: {
+    name: "Perfect Squares",
+    description: "Collect all perfect square numbers",
+    isMatch: (num: number) => {
+      const sqrt = Math.sqrt(num);
+      return sqrt === Math.floor(sqrt);
+    }
   }
 };
 
@@ -69,8 +81,14 @@ export const levels: GameLevel[] = [
   },
   {
     id: 6,
-    rule: rules.equalsTo42,
+    rule: rules.sumEquals10,
     maze: generateRandomMaze(10, 10),
     glitchSpeed: 2,
+  },
+  {
+    id: 7,
+    rule: rules.perfectSquares,
+    maze: generateRandomMaze(10, 10),
+    glitchSpeed: 2.2,
   }
 ];
