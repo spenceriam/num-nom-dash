@@ -108,25 +108,27 @@ export function movementLogic({
     updatedNumbers.filter(num => currentRule.isMatch(num.value)) : 
     [];
   
-  // If only one valid number remains, glitches will chase the player
-  const shouldChase = remainingValidNumbers.length === 1;
+  // Glitches will now actively seek matching numbers
+  const shouldChase = remainingValidNumbers.length > 0;
   
-  // Move all glitches
-  let updatedGlitchPositions = prev.glitchPositions.map(glitch => 
-    shouldChase ? 
+  // Move all glitches and let them consume numbers
+  let updatedGlitchPositions = prev.glitchPositions.map(glitch => {
+    const newGlitchPos = shouldChase ? 
       getChaseMove(glitch, playerPosition, prev.walls) :
-      getRandomGlitchMove(glitch, prev.walls, playerPosition)
-  );
+      getRandomGlitchMove(glitch, prev.walls, playerPosition);
 
-  // Check if any glitch is on a number and remove that number
-  updatedGlitchPositions.forEach(glitch => {
-    const numberIndex = updatedNumbers.findIndex(num => 
-      isPositionEqual(num.position, glitch)
+    // Check if glitch consumes a matching number
+    const numberAtNewPos = updatedNumbers.findIndex(num => 
+      isPositionEqual(num.position, newGlitchPos) && 
+      currentRule?.isMatch(num.value)
     );
-    if (numberIndex !== -1) {
-      updatedNumbers.splice(numberIndex, 1);
-      toast.error("A glitch consumed a number!");
+    
+    if (numberAtNewPos !== -1) {
+      updatedNumbers.splice(numberAtNewPos, 1);
+      toast.error("A glitch consumed a matching number!");
     }
+    
+    return newGlitchPos;
   });
 
   const collectedNumberIndex = updatedNumbers.findIndex((num) =>

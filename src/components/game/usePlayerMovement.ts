@@ -1,5 +1,4 @@
-
-import { useCallback } from "react";
+import { useCallback, useRef, useEffect } from "react";
 import { Position, GameStatus, GameRule } from "./types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { movementLogic } from "./movementLogic";
@@ -23,6 +22,71 @@ export const usePlayerMovement = ({
   onLevelComplete,
 }: UsePlayerMovementProps) => {
   const isMobile = useIsMobile();
+  const moveIntervalRef = useRef<number>();
+  const targetPositionRef = useRef<Position | null>(null);
+
+  // Calculate next position in path to target
+  const getNextPosition = (current: Position, target: Position): Position => {
+    const dx = target.x - current.x;
+    const dy = target.y - current.y;
+    
+    // Move one step at a time, prioritizing the larger difference
+    if (Math.abs(dx) > Math.abs(dy)) {
+      return {
+        x: current.x + Math.sign(dx),
+        y: current.y
+      };
+    } else if (dy !== 0) {
+      return {
+        x: current.x,
+        y: current.y + Math.sign(dy)
+      };
+    }
+    return current;
+  };
+
+  // Stop movement when target is reached
+  const stopMovement = () => {
+    if (moveIntervalRef.current) {
+      clearInterval(moveIntervalRef.current);
+      moveIntervalRef.current = undefined;
+    }
+    targetPositionRef.current = null;
+  };
+
+  // Start movement towards target
+  const startMovement = (target: Position) => {
+    if (moveIntervalRef.current) {
+      stopMovement();
+    }
+
+    targetPositionRef.current = target;
+    moveIntervalRef.current = window.setInterval(() => {
+      setGameStatus(prev => {
+        const nextPos = getNextPosition(prev.playerPosition, target);
+        
+        // Stop if we reached the target
+        if (isPositionEqual(nextPos, target)) {
+          stopMovement();
+        }
+        
+        return movementLogic({
+          prev,
+          newPos: nextPos,
+          currentRule,
+          onGameOver,
+          onLevelComplete
+        });
+      });
+    }, 150); // Adjust speed by changing interval
+  };
+
+  // Clean up interval on unmount
+  useEffect(() => {
+    return () => {
+      stopMovement();
+    };
+  }, []);
 
   // Keyboard controls
   useKeyboardMovement({ setGameStatus, gameStatus, currentRule, onGameOver, onLevelComplete });
@@ -49,29 +113,18 @@ export const usePlayerMovement = ({
     }
   }, [gameStatus.remainingNumbers, currentRule, onLevelComplete]);
 
-  // Allow movement to any cell by clicking
+  // Update movePlayerByClick to use path movement
   const movePlayerByClick = useCallback(
     (pos: Position) => {
-      setGameStatus((prev) => {
-        const { walls, glitchPositions } = prev;
-        const isWall = walls.some((wall) => isPositionEqual(wall, pos));
-        const isGlitch = glitchPositions.some((g) =>
-          isPositionEqual(g, pos)
-        );
-        if (isWall || isGlitch) return prev;
-        
-        const newState = movementLogic({ 
-          prev, 
-          newPos: pos, 
-          currentRule, 
-          onGameOver,
-          onLevelComplete
-        });
-        
-        return newState;
-      });
+      const { walls, glitchPositions } = gameStatus;
+      const isWall = walls.some(wall => isPositionEqual(wall, pos));
+      const isGlitch = glitchPositions.some(g => isPositionEqual(g, pos));
+      
+      if (isWall || isGlitch) return;
+      
+      startMovement(pos);
     },
-    [setGameStatus, currentRule, onGameOver, onLevelComplete]
+    [gameStatus, currentRule, onGameOver, onLevelComplete]
   );
 
   const handleMove = useCallback(
