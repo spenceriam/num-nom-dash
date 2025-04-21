@@ -31,28 +31,24 @@ export const GameBoard = ({ playerPosition, glitchPositions, walls, numbers, onC
       const number = numbers.find(n => isPositionEqual(n.position, position));
       
       let cellContent;
-      let cellClass = "flex items-center justify-center bg-white border border-purple-200";
+      let cellClass = "w-full h-full flex items-center justify-center bg-white border border-purple-200";
       let isClickable = false;
 
       if (isWall) {
-        cellClass = "bg-gray-800";
+        cellClass = "w-full h-full bg-gray-800";
         cellContent = null;
       } else if (isPlayer) {
         cellClass += " bg-green-500";
         cellContent = (
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="w-4/5 h-4/5 rounded-full bg-green-700 flex items-center justify-center text-white font-bold shadow-md">
-              N
-            </div>
+          <div className="w-4/5 h-4/5 rounded-full bg-green-700 flex items-center justify-center text-white font-bold shadow-md">
+            N
           </div>
         );
       } else if (isGlitch) {
         cellClass += " bg-red-100";
         cellContent = (
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="w-4/5 h-4/5 rounded-full bg-red-500 flex items-center justify-center text-white font-bold">
-              G
-            </div>
+          <div className="w-4/5 h-4/5 rounded-full bg-red-500 flex items-center justify-center text-white font-bold">
+            G
           </div>
         );
       } else if (number) {
@@ -75,14 +71,13 @@ export const GameBoard = ({ playerPosition, glitchPositions, walls, numbers, onC
       cells.push(
         <div 
           key={`${x}-${y}`}
-          className={cellClass}
-          style={{ width: '16.666%', aspectRatio: '1/1' }}
+          className="w-1/6 aspect-square relative"
           onClick={isClickable ? () => onCellClick(position) : undefined}
           tabIndex={isClickable ? 0 : -1}
           aria-label={isClickable ? `Move to ${number ? number.value : ''}` : undefined}
           role={isClickable ? "button" : undefined}
         >
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className={cellClass}>
             {cellContent}
           </div>
         </div>
@@ -96,10 +91,7 @@ export const GameBoard = ({ playerPosition, glitchPositions, walls, numbers, onC
   }
   
   return (
-    <div 
-      className="grid gap-1 bg-purple-100 p-1 rounded-lg shadow-inner"
-      style={{ aspectRatio: '1/1' }}
-    >
+    <div className="w-full bg-purple-100 p-1 rounded-lg shadow-inner" style={{ aspectRatio: '1/1' }}>
       {rows}
     </div>
   );
