@@ -10,8 +10,8 @@ type GameHeaderProps = {
 export const GameHeader = ({ level, lives, score }: GameHeaderProps) => {
   return (
     <div className="flex justify-between items-center mb-4">
-      <div className="text-purple-900 font-semibold">Level: {level}</div>
-      <div className="text-purple-900 font-semibold flex items-center gap-1">
+      <div className="text-[#012A4A] font-semibold">Level: {level}</div>
+      <div className="text-[#012A4A] font-semibold flex items-center gap-1">
         {Array.from({ length: lives }).map((_, i) => (
           <Sparkles 
             key={i}
@@ -20,8 +20,7 @@ export const GameHeader = ({ level, lives, score }: GameHeaderProps) => {
           />
         ))}
       </div>
-      <div className="text-purple-900 font-semibold">Score: {score}</div>
+      <div className="text-[#012A4A] font-semibold">Score: {score}</div>
     </div>
   );
 };
-

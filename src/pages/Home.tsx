@@ -7,18 +7,18 @@ import { RulesDialog } from "@/components/game/RulesDialog";
 const Home = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-white/90 backdrop-blur-sm shadow-lg border-2 border-[#468FAF]/20">
+      <Card className="w-full max-w-md bg-white/80 backdrop-blur-sm shadow-lg border-2 border-[#014F86]/20">
         <CardContent className="p-6 space-y-6">
           <div className="text-center space-y-2">
-            <h1 className="text-4xl font-bold text-purple-800">Num Nom Dash</h1>
-            <p className="text-gray-600">
+            <h1 className="text-4xl font-bold text-[#012A4A]">Num Nom Dash</h1>
+            <p className="text-[#01497C]">
               A fast-paced number collecting adventure where quick thinking meets mathematical challenges!
             </p>
           </div>
 
-          <div className="bg-purple-100 p-4 rounded-lg">
-            <h2 className="font-semibold text-purple-800 mb-2">About the Game</h2>
-            <p className="text-gray-700 text-sm">
+          <div className="bg-[#89C2D9]/20 p-4 rounded-lg">
+            <h2 className="font-semibold text-[#013A63] mb-2">About the Game</h2>
+            <p className="text-[#014F86] text-sm">
               Guide Num Nom through mazes while collecting numbers that match specific rules. 
               Watch out for Glitches that will try to stop you! Can you master all the levels?
             </p>
@@ -26,7 +26,7 @@ const Home = () => {
 
           <div className="flex flex-col gap-4">
             <Link to="/play" className="w-full">
-              <Button className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-lg py-6">
+              <Button className="w-full bg-gradient-to-r from-[#012A4A] to-[#014F86] text-white text-lg py-6 hover:opacity-90 transition-opacity">
                 Play Game
               </Button>
             </Link>
@@ -34,7 +34,9 @@ const Home = () => {
             <div className="flex justify-between gap-2">
               <RulesDialog />
               <Link to="/high-scores">
-                <Button variant="secondary">High Scores</Button>
+                <Button variant="secondary" className="bg-[#89C2D9]/20 text-[#012A4A] hover:bg-[#89C2D9]/30">
+                  High Scores
+                </Button>
               </Link>
             </div>
           </div>

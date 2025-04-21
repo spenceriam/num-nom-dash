@@ -124,7 +124,7 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
     gameStatus.remainingNumbers.filter(n => currentRule.isMatch(n.value)).length : 0;
 
   return (
-    <div className="game-container relative bg-white/90 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-[#468FAF]/20">
+    <div className="game-container relative bg-white/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border-2 border-[#014F86]/20">
       <GameHeader 
         level={level} 
         lives={gameStatus.lives} 
