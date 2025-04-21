@@ -1,0 +1,112 @@
+
+import { GameStatus, Position, GameRule } from "../types";
+import { isPositionEqual } from "../utils";
+import { getChaseMove } from "./glitchMovement";
+import { toast } from "sonner";
+
+type ProcessMovementParams = {
+  prev: GameStatus;
+  newPos: Position;
+  currentRule: GameRule | null;
+  onGameOver: (score: number) => void;
+  onLevelComplete?: () => void;
+};
+
+export function processMovement({
+  prev,
+  newPos,
+  currentRule,
+  onGameOver,
+  onLevelComplete,
+}: ProcessMovementParams): GameStatus {
+  // Don't allow moving through walls
+  if (prev.walls.some((wall) => isPositionEqual(wall, newPos))) {
+    return prev;
+  }
+
+  let updatedNumbers = [...prev.remainingNumbers];
+  let score = prev.score;
+  let lives = prev.lives;
+  let playerPosition = newPos;
+
+  // Check if player collects a number
+  const collectedNumberIndex = updatedNumbers.findIndex((num) =>
+    isPositionEqual(num.position, newPos)
+  );
+
+  if (collectedNumberIndex !== -1) {
+    const collectedNumber = updatedNumbers[collectedNumberIndex];
+
+    if (currentRule && currentRule.isMatch(collectedNumber.value)) {
+      score += 10;
+      updatedNumbers.splice(collectedNumberIndex, 1);
+      toast.success(`+10 points!`);
+    } else {
+      lives -= 1;
+      toast.error(`Wrong number! Rule: ${currentRule?.name || 'No rule'}`);
+      updatedNumbers.splice(collectedNumberIndex, 1);
+      playerPosition = prev.playerStart || { x: 0, y: 0 };
+
+      if (lives <= 0) {
+        onGameOver(score);
+        return prev;
+      }
+    }
+  }
+
+  // Move all glitches and let them randomly consume numbers
+  let updatedGlitchPositions = prev.glitchPositions.map(glitch => {
+    const newGlitchPos = getChaseMove(glitch, playerPosition, prev.walls);
+
+    // Random chance (30%) to attempt consuming a number
+    if (Math.random() < 0.3) {
+      const numberAtNewPos = updatedNumbers.findIndex(num => 
+        isPositionEqual(num.position, newGlitchPos)
+      );
+      
+      if (numberAtNewPos !== -1) {
+        updatedNumbers.splice(numberAtNewPos, 1);
+        if (currentRule?.isMatch(updatedNumbers[numberAtNewPos].value)) {
+          toast.error("A glitch consumed a matching number!");
+        }
+      }
+    }
+    
+    return newGlitchPos;
+  });
+
+  // Check if there are any matching numbers left
+  const remainingCorrectNumbers = updatedNumbers.filter((num) =>
+    currentRule?.isMatch(num.value)
+  );
+
+  if (remainingCorrectNumbers.length === 0 && updatedNumbers.length > 0 && currentRule) {
+    onLevelComplete?.();
+  }
+
+  // Handle glitch collision
+  if (updatedGlitchPositions.some((g) => isPositionEqual(g, newPos))) {
+    lives = prev.lives - 1;
+    if (lives <= 0) {
+      onGameOver(score);
+      return prev;
+    } else {
+      toast.error(`Hit by a glitch! 1 life lost - ${lives} remaining`);
+      return {
+        ...prev,
+        lives,
+        playerPosition: prev.playerStart || { x: 0, y: 0 },
+        glitchPositions: updatedGlitchPositions
+      };
+    }
+  }
+
+  return {
+    ...prev,
+    playerPosition,
+    score,
+    lives,
+    remainingNumbers: updatedNumbers,
+    glitchPositions: updatedGlitchPositions
+  };
+}
