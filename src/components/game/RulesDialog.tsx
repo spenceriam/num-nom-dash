@@ -1,4 +1,3 @@
-
 import {
   Dialog,
   DialogContent,
@@ -30,6 +29,7 @@ export function RulesDialog() {
           <div>
             <h4 className="font-semibold mb-2 text-purple-800 flex items-center gap-2">
               <Circle className="text-green-500" size={20} /> Num Nom (You)
+              <Bug className="text-red-500 ml-2" size={20} />
             </h4>
             <ul className="list-disc pl-5 space-y-2 text-sm">
               <li>Use arrow keys or swipe to move Num Nom around the maze</li>
