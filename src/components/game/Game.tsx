@@ -8,6 +8,7 @@ import { isPositionEqual } from "./utils";
 import { usePlayerMovement } from "./usePlayerMovement";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type GameProps = {
   onGameOver: (score: number) => void;
@@ -64,7 +65,7 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
     
     setCurrentRule(gameLevel.rule);
     const initialGameStatus = {
-      score: gameStatus.score, // Keep the current score
+      score: gameStatus.score,
       lives: INITIAL_LIVES,
       level,
       playerPosition: gameLevel.maze.playerStart,
@@ -90,7 +91,6 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
     };
   }, [level]);
   
-  // Only initialize a new level when the level actually changes
   useEffect(() => {
     if (!gameInitializedRef.current) return;
     
@@ -99,7 +99,7 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
     
     setCurrentRule(gameLevel.rule);
     setGameStatus(prev => ({
-      score: prev.score, // Keep the current score
+      score: prev.score,
       lives: INITIAL_LIVES,
       level,
       playerPosition: gameLevel.maze.playerStart,
@@ -114,16 +114,11 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
     });
   }, [level]);
 
-  // Count remaining matching numbers for debugging
   const remainingMatchingCount = currentRule ? 
     gameStatus.remainingNumbers.filter(n => currentRule.isMatch(n.value)).length : 0;
 
   return (
-    <div 
-      className="game-container relative"
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-    >
+    <div className="game-container relative">
       <div className="flex justify-between items-center mb-4">
         <div className="text-purple-900 font-semibold">Level: {level}</div>
         <div className="text-purple-900 font-semibold flex items-center gap-1">
@@ -173,12 +168,21 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
         </AlertDialogContent>
       </AlertDialog>
       
-      {isMobile && (
+      <div className="mt-6 flex justify-center">
+        <Button 
+          variant="outline" 
+          className="text-purple-800 border-purple-300 hover:bg-purple-50"
+          onClick={() => onGameOver(gameStatus.score)}
+        >
+          New Game
+        </Button>
+      </div>
+      
+      {isMobile ? (
         <div className="mt-4 text-center text-sm text-gray-500">
           Swipe or tap adjacent square to move Num Nom
         </div>
-      )}
-      {!isMobile && (
+      ) : (
         <div className="mt-4 text-center text-sm text-gray-500">
           Click an adjacent square or use arrow keys to move Num Nom
         </div>
