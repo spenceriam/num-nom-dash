@@ -170,9 +170,8 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
       
       <div className="mt-6 flex justify-center">
         <Button 
-          variant="outline" 
-          className="text-purple-800 border-purple-300 hover:bg-purple-50"
           onClick={() => onGameOver(gameStatus.score)}
+          className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-2 rounded-full hover:opacity-90 transition-opacity"
         >
           New Game
         </Button>
