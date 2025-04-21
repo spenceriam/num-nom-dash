@@ -7,9 +7,16 @@ type GameBoardProps = {
   glitchPositions: Position[];
   walls: Position[];
   numbers: { position: Position; value: number }[];
+  onCellClick?: (position: Position) => void;
 };
 
-export const GameBoard = ({ playerPosition, glitchPositions, walls, numbers }: GameBoardProps) => {
+const isAdjacent = (player: Position, cell: Position) => {
+  const dx = Math.abs(player.x - cell.x);
+  const dy = Math.abs(player.y - cell.y);
+  return (dx + dy === 1);
+};
+
+export const GameBoard = ({ playerPosition, glitchPositions, walls, numbers, onCellClick }: GameBoardProps) => {
   const boardSize = 10; // 10x10 grid
   const cells = [];
   
@@ -23,7 +30,8 @@ export const GameBoard = ({ playerPosition, glitchPositions, walls, numbers }: G
       
       let cellContent;
       let cellClass = "flex items-center justify-center bg-white border border-purple-200";
-      
+      let isClickable = false;
+
       if (isWall) {
         cellClass = "bg-gray-800";
         cellContent = null;
@@ -50,12 +58,28 @@ export const GameBoard = ({ playerPosition, glitchPositions, walls, numbers }: G
           <span className="text-purple-900 font-medium">{number.value}</span>
         );
       }
-      
+
+      // Can only click to move into adjacent cells (if not a wall/glitch)
+      if (
+        onCellClick &&
+        !isWall &&
+        !isPlayer &&
+        !isGlitch &&
+        isAdjacent(playerPosition, position)
+      ) {
+        isClickable = true;
+        cellClass += " cursor-pointer hover:ring-2 hover:ring-green-400";
+      }
+
       cells.push(
         <div 
           key={`${x}-${y}`}
           className={cellClass}
           style={{ width: '100%', paddingBottom: '100%', position: 'relative' }}
+          onClick={isClickable ? () => onCellClick(position) : undefined}
+          tabIndex={isClickable ? 0 : -1}
+          aria-label={isClickable ? "Move here" : undefined}
+          role="button"
         >
           <div className="absolute inset-0 flex items-center justify-center">
             {cellContent}

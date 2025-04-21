@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -29,7 +28,6 @@ const Game = ({ onGameOver, level }: GameProps) => {
   const gameLoopRef = useRef<number | null>(null);
   const touchStartRef = useRef<Position | null>(null);
   
-  // Initialize game
   useEffect(() => {
     const gameLevel = levels.find(l => l.id === level);
     if (!gameLevel) return;
@@ -56,7 +54,6 @@ const Game = ({ onGameOver, level }: GameProps) => {
     };
   }, [level]);
   
-  // Handle keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       let direction: Direction | null = null;
@@ -86,7 +83,6 @@ const Game = ({ onGameOver, level }: GameProps) => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [gameStatus]);
   
-  // Handle touch controls
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!isMobile) return;
     
@@ -104,16 +100,13 @@ const Game = ({ onGameOver, level }: GameProps) => {
     const dx = endPos.x - startPos.x;
     const dy = endPos.y - startPos.y;
     
-    // Determine swipe direction
     if (Math.abs(dx) > Math.abs(dy)) {
-      // Horizontal swipe
       if (dx > 50) {
         movePlayer("right");
       } else if (dx < -50) {
         movePlayer("left");
       }
     } else {
-      // Vertical swipe
       if (dy > 50) {
         movePlayer("down");
       } else if (dy < -50) {
@@ -123,12 +116,23 @@ const Game = ({ onGameOver, level }: GameProps) => {
     
     touchStartRef.current = null;
   };
-  
+
+  const movePlayerByClick = (pos: Position) => {
+    setGameStatus(prev => {
+      const { playerPosition, walls, glitchPositions } = prev;
+      const dx = Math.abs(playerPosition.x - pos.x);
+      const dy = Math.abs(playerPosition.y - pos.y);
+      const isAdjacent = dx + dy === 1;
+      const isWall = walls.some(wall => isPositionEqual(wall, pos));
+      const isGlitch = glitchPositions.some(glitch => isPositionEqual(glitch, pos));
+      if (!isAdjacent || isWall || isGlitch) return prev;
+      return moveLogic(prev, pos);
+    });
+  };
+
   const movePlayer = (direction: Direction) => {
     setGameStatus(prev => {
-      const newPos = { ...prev.playerPosition };
-      
-      // Calculate new position based on direction
+      let newPos = { ...prev.playerPosition };
       switch (direction) {
         case "up":
           newPos.y = Math.max(0, newPos.y - 1);
@@ -143,71 +147,66 @@ const Game = ({ onGameOver, level }: GameProps) => {
           newPos.x = Math.min(9, newPos.x + 1);
           break;
       }
-      
-      // Check for wall collision
-      if (prev.walls.some(wall => isPositionEqual(wall, newPos))) {
-        return prev; // Can't move into walls
-      }
-      
-      // Check for number collection
-      let updatedNumbers = [...prev.remainingNumbers];
-      let score = prev.score;
-      
-      const collectedNumberIndex = updatedNumbers.findIndex(num => 
-        isPositionEqual(num.position, newPos)
-      );
-      
-      if (collectedNumberIndex !== -1) {
-        const collectedNumber = updatedNumbers[collectedNumberIndex];
-        
-        if (currentRule?.isMatch(collectedNumber.value)) {
-          // Correct number collected
-          score += 10;
-          updatedNumbers.splice(collectedNumberIndex, 1);
-          toast.success(`+10 points!`);
-        } else {
-          // Wrong number collected
-          toast.error("Wrong number!");
-        }
-      }
-      
-      // Check for completion
-      const remainingCorrectNumbers = updatedNumbers.filter(num => 
-        currentRule?.isMatch(num.value)
-      );
-      
-      if (remainingCorrectNumbers.length === 0 && updatedNumbers.length !== prev.remainingNumbers.length) {
-        toast.success("Level complete!");
-        // In a real implementation, we would change levels here
-      }
-      
-      // Check for glitch collision
-      if (prev.glitchPositions.some(glitch => isPositionEqual(glitch, newPos))) {
-        const lives = prev.lives - 1;
-        
-        if (lives <= 0) {
-          // Game over
-          onGameOver(score);
-          return prev;
-        } else {
-          toast.error(`Lost a life! ${lives} remaining`);
-          return {
-            ...prev,
-            lives,
-            playerPosition: prev.playerPosition // Don't move into glitch
-          };
-        }
-      }
-      
-      return {
-        ...prev,
-        playerPosition: newPos,
-        score,
-        remainingNumbers: updatedNumbers
-      };
+      return moveLogic(prev, newPos);
     });
   };
-  
+
+  const moveLogic = (prev: GameStatus, newPos: Position): GameStatus => {
+    if (prev.walls.some(wall => isPositionEqual(wall, newPos))) {
+      return prev;
+    }
+
+    let updatedNumbers = [...prev.remainingNumbers];
+    let score = prev.score;
+
+    const collectedNumberIndex = updatedNumbers.findIndex(num => 
+      isPositionEqual(num.position, newPos)
+    );
+
+    if (collectedNumberIndex !== -1) {
+      const collectedNumber = updatedNumbers[collectedNumberIndex];
+
+      if (currentRule?.isMatch(collectedNumber.value)) {
+        score += 10;
+        updatedNumbers.splice(collectedNumberIndex, 1);
+        toast.success(`+10 points!`);
+      } else {
+        toast.error("Wrong number!");
+      }
+    }
+
+    const remainingCorrectNumbers = updatedNumbers.filter(num => 
+      currentRule?.isMatch(num.value)
+    );
+
+    if (remainingCorrectNumbers.length === 0 && updatedNumbers.length !== prev.remainingNumbers.length) {
+      toast.success("Level complete!");
+    }
+
+    if (prev.glitchPositions.some(glitch => isPositionEqual(glitch, newPos))) {
+      const lives = prev.lives - 1;
+
+      if (lives <= 0) {
+        onGameOver(score);
+        return prev;
+      } else {
+        toast.error(`Lost a life! ${lives} remaining`);
+        return {
+          ...prev,
+          lives,
+          playerPosition: prev.playerPosition
+        };
+      }
+    }
+
+    return {
+      ...prev,
+      playerPosition: newPos,
+      score,
+      remainingNumbers: updatedNumbers
+    };
+  };
+
   return (
     <div 
       className="game-container"
@@ -230,11 +229,17 @@ const Game = ({ onGameOver, level }: GameProps) => {
         glitchPositions={gameStatus.glitchPositions}
         walls={gameStatus.walls}
         numbers={gameStatus.remainingNumbers}
+        onCellClick={movePlayerByClick}
       />
       
       {isMobile && (
         <div className="mt-4 text-center text-sm text-gray-500">
-          Swipe to move Num Nom
+          Swipe or tap adjacent square to move Num Nom
+        </div>
+      )}
+      {!isMobile && (
+        <div className="mt-4 text-center text-sm text-gray-500">
+          Click an adjacent square or use arrow keys to move Num Nom
         </div>
       )}
     </div>
