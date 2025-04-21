@@ -94,6 +94,7 @@ export function movementLogic({
   onGameOver,
   onLevelComplete,
 }: MovementLogicParams): GameStatus {
+  // Don't allow moving through walls
   if (prev.walls.some((wall) => isPositionEqual(wall, newPos))) {
     return prev;
   }
@@ -131,6 +132,7 @@ export function movementLogic({
     return newGlitchPos;
   });
 
+  // Check if player collects a number
   const collectedNumberIndex = updatedNumbers.findIndex((num) =>
     isPositionEqual(num.position, newPos)
   );
@@ -169,7 +171,7 @@ export function movementLogic({
     currentRule?.isMatch(num.value)
   );
 
-  if (remainingCorrectNumbers.length === 0 && currentRule) {
+  if (remainingCorrectNumbers.length === 0 && updatedNumbers.length > 0 && currentRule) {
     onLevelComplete?.();
   }
 

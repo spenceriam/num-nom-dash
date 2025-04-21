@@ -1,3 +1,4 @@
+
 import { useCallback, useRef, useEffect } from "react";
 import { Position, GameStatus, GameRule } from "./types";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -45,7 +46,7 @@ export const usePlayerMovement = ({
     return current;
   };
 
-  // Stop movement when target is reached
+  // Stop movement when target is reached or path is blocked
   const stopMovement = () => {
     if (moveIntervalRef.current) {
       clearInterval(moveIntervalRef.current);
@@ -63,22 +64,32 @@ export const usePlayerMovement = ({
     targetPositionRef.current = target;
     moveIntervalRef.current = window.setInterval(() => {
       setGameStatus(prev => {
+        // Get next position in path to target
         const nextPos = getNextPosition(prev.playerPosition, target);
         
-        // Stop if we reached the target
-        if (isPositionEqual(nextPos, target)) {
+        // Check if path is blocked by a wall
+        if (prev.walls.some(wall => isPositionEqual(wall, nextPos))) {
           stopMovement();
+          return prev;
         }
         
-        return movementLogic({
+        // Apply movement logic (which handles number collection and other game rules)
+        const newState = movementLogic({
           prev,
           newPos: nextPos,
           currentRule,
           onGameOver,
           onLevelComplete
         });
+        
+        // Stop if we reached the target or died
+        if (isPositionEqual(newState.playerPosition, target) || newState.lives < prev.lives) {
+          stopMovement();
+        }
+        
+        return newState;
       });
-    }, 150); // Adjust speed by changing interval
+    }, 300); // Slower movement - 300ms per step
   };
 
   // Clean up interval on unmount
@@ -117,10 +128,12 @@ export const usePlayerMovement = ({
   const movePlayerByClick = useCallback(
     (pos: Position) => {
       const { walls, glitchPositions } = gameStatus;
-      const isWall = walls.some(wall => isPositionEqual(wall, pos));
-      const isGlitch = glitchPositions.some(g => isPositionEqual(g, pos));
       
-      if (isWall || isGlitch) return;
+      // Don't allow clicking on walls or glitches
+      if (walls.some(wall => isPositionEqual(wall, pos)) || 
+          glitchPositions.some(g => isPositionEqual(g, pos))) {
+        return;
+      }
       
       startMovement(pos);
     },
