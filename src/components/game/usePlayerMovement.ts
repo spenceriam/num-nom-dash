@@ -1,4 +1,3 @@
-
 import { useCallback, useRef, useEffect } from "react";
 import { Position, GameStatus, GameRule } from "./types";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -24,14 +23,13 @@ export const usePlayerMovement = ({
 }: UsePlayerMovementProps) => {
   const isMobile = useIsMobile();
   const moveIntervalRef = useRef<number>();
+  const glitchIntervalRef = useRef<number>();
   const targetPositionRef = useRef<Position | null>(null);
 
-  // Calculate next position in path to target
   const getNextPosition = (current: Position, target: Position): Position => {
     const dx = target.x - current.x;
     const dy = target.y - current.y;
     
-    // Move one step at a time, prioritizing the larger difference
     if (Math.abs(dx) > Math.abs(dy)) {
       return {
         x: current.x + Math.sign(dx),
@@ -46,7 +44,6 @@ export const usePlayerMovement = ({
     return current;
   };
 
-  // Stop movement when target is reached or path is blocked
   const stopMovement = () => {
     if (moveIntervalRef.current) {
       clearInterval(moveIntervalRef.current);
@@ -55,7 +52,34 @@ export const usePlayerMovement = ({
     targetPositionRef.current = null;
   };
 
-  // Start movement towards target
+  const moveGlitches = useCallback(() => {
+    setGameStatus(prev => {
+      const newGlitchPositions = prev.glitchPositions.map(glitch => {
+        const nextGlitchPos = movementLogic.getChaseMove(
+          glitch, 
+          prev.playerPosition, 
+          prev.walls
+        );
+        return nextGlitchPos;
+      });
+
+      return {
+        ...prev,
+        glitchPositions: newGlitchPositions
+      };
+    });
+  }, [setGameStatus]);
+
+  useEffect(() => {
+    glitchIntervalRef.current = window.setInterval(moveGlitches, 600);
+    
+    return () => {
+      if (glitchIntervalRef.current) {
+        clearInterval(glitchIntervalRef.current);
+      }
+    };
+  }, [moveGlitches]);
+
   const startMovement = (target: Position) => {
     if (moveIntervalRef.current) {
       stopMovement();
@@ -64,19 +88,15 @@ export const usePlayerMovement = ({
     targetPositionRef.current = target;
     moveIntervalRef.current = window.setInterval(() => {
       setGameStatus(prev => {
-        // Get next position in path to target
         const nextPos = getNextPosition(prev.playerPosition, target);
         
-        // Check if path is blocked by a wall
         if (prev.walls.some(wall => isPositionEqual(wall, nextPos))) {
           stopMovement();
           return prev;
         }
         
-        // During movement, only update position without collecting numbers
         let newState = { ...prev, playerPosition: nextPos };
         
-        // If we've reached the final target, apply full movement logic (collect numbers, check game rules)
         if (isPositionEqual(nextPos, target)) {
           newState = movementLogic({
             prev,
@@ -85,11 +105,9 @@ export const usePlayerMovement = ({
             onGameOver,
             onLevelComplete
           });
-          
           stopMovement();
         }
         
-        // Check if we died due to hitting a glitch during movement
         if (prev.glitchPositions.some(g => isPositionEqual(g, nextPos))) {
           newState = movementLogic({
             prev,
@@ -106,20 +124,17 @@ export const usePlayerMovement = ({
         
         return newState;
       });
-    }, 300); // Slower movement - 300ms per step
+    }, 300);
   };
 
-  // Clean up interval on unmount
   useEffect(() => {
     return () => {
       stopMovement();
     };
   }, []);
 
-  // Keyboard controls
   useKeyboardMovement({ setGameStatus, gameStatus, currentRule, onGameOver, onLevelComplete });
 
-  // Touch controls
   const { handleTouchStart, handleTouchEnd } = useTouchMovement({
     setGameStatus,
     gameStatus,
@@ -128,7 +143,6 @@ export const usePlayerMovement = ({
     onLevelComplete,
   });
 
-  // Check if level is complete after each render
   const checkLevelCompletion = useCallback(() => {
     if (!currentRule) return;
     
@@ -141,12 +155,10 @@ export const usePlayerMovement = ({
     }
   }, [gameStatus.remainingNumbers, currentRule, onLevelComplete]);
 
-  // Update movePlayerByClick to use path movement
   const movePlayerByClick = useCallback(
     (pos: Position) => {
       const { walls, glitchPositions } = gameStatus;
       
-      // Don't allow clicking on walls or glitches
       if (walls.some(wall => isPositionEqual(wall, pos)) || 
           glitchPositions.some(g => isPositionEqual(g, pos))) {
         return;
