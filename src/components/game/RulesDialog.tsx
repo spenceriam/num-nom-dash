@@ -32,7 +32,7 @@ export function RulesDialog() {
             <ul className="list-disc pl-5 space-y-2 text-sm">
               <li>Use arrow keys or swipe to move Num Nom around the maze</li>
               <li>Each level has a specific rule for which numbers you need to collect</li>
-              <li>You have 3 lives per level - don't hit the glitches!</li>
+              <li>You have 3 lives per level - don't consume the wrong answers</li>
               <li>Collect all valid numbers to advance to the next level</li>
             </ul>
           </div>
