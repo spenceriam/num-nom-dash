@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { saveScore } from "./highScores";
 import { toast } from "sonner";
 import { Home } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 type GameOverScreenProps = {
   score: number;
@@ -15,6 +15,7 @@ type GameOverScreenProps = {
 const GameOverScreen = ({ score, onRestart }: GameOverScreenProps) => {
   const [playerName, setPlayerName] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const navigate = useNavigate();
   
   const handleSubmitScore = async () => {
     if (!playerName.trim()) {
@@ -29,6 +30,14 @@ const GameOverScreen = ({ score, onRestart }: GameOverScreenProps) => {
     } else {
       toast.error("Failed to save score");
     }
+  };
+  
+  const handleHome = () => {
+    // Clear any game state in session storage
+    sessionStorage.removeItem("gameState");
+    sessionStorage.removeItem("gameScore");
+    sessionStorage.removeItem("gameLevel");
+    navigate("/");
   };
   
   return (
@@ -68,13 +77,12 @@ const GameOverScreen = ({ score, onRestart }: GameOverScreenProps) => {
         >
           Play Again
         </Button>
-        <Link to="/">
-          <Button
-            className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-2 rounded-full hover:opacity-90 transition-opacity"
-          >
-            <Home className="mr-2" /> Home
-          </Button>
-        </Link>
+        <Button
+          onClick={handleHome}
+          className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-2 rounded-full hover:opacity-90 transition-opacity"
+        >
+          <Home className="mr-2" /> Home
+        </Button>
       </div>
     </div>
   );
