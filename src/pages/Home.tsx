@@ -10,7 +10,7 @@ const Home = () => {
       <Card className="w-full max-w-md shadow-lg border-2 border-purple-200">
         <CardContent className="p-6 space-y-6">
           <div className="text-center space-y-2">
-            <h1 className="text-4xl font-bold text-purple-800">Num Dash</h1>
+            <h1 className="text-4xl font-bold text-purple-800">Num Nom Dash</h1>
             <p className="text-gray-600">
               A fast-paced number collecting adventure where quick thinking meets mathematical challenges!
             </p>

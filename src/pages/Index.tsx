@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -55,7 +56,7 @@ const Index = () => {
             <div className="flex items-center gap-2">
               <RulesDialog />
             </div>
-            <h1 className="text-2xl font-bold text-center flex-1">Num Dash</h1>
+            <h1 className="text-2xl font-bold text-center flex-1">Num Nom Dash</h1>
             <Link to="/high-scores">
               <Button variant="secondary" size="sm">
                 High Scores
