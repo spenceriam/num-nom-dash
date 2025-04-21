@@ -70,8 +70,7 @@ const GameOverScreen = ({ score, onRestart }: GameOverScreenProps) => {
         </Button>
         <Link to="/">
           <Button
-            variant="secondary"
-            className="px-8 py-2"
+            className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-2 rounded-full hover:opacity-90 transition-opacity"
           >
             <Home className="mr-2" /> Home
           </Button>
@@ -82,3 +81,4 @@ const GameOverScreen = ({ score, onRestart }: GameOverScreenProps) => {
 };
 
 export default GameOverScreen;
+
