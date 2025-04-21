@@ -1,7 +1,7 @@
 
 import { useEffect } from "react";
 import { Direction, GameStatus, GameRule, Position } from "./types";
-import { movementLogic } from "./movementLogic";
+import { processMovement } from "./movementLogic";
 
 type UseKeyboardMovementProps = {
   setGameStatus: React.Dispatch<React.SetStateAction<GameStatus>>;
@@ -71,7 +71,7 @@ export function useKeyboardMovement({
               newPos.x = Math.min(5, newPos.x + 1);
               break;
           }
-          return movementLogic({ 
+          return processMovement({ 
             prev, 
             newPos, 
             currentRule, 
@@ -87,7 +87,7 @@ export function useKeyboardMovement({
             x: Math.max(0, Math.min(5, playerPosition.x + diagonal!.dx)),
             y: Math.max(0, Math.min(5, playerPosition.y + diagonal!.dy)),
           };
-          return movementLogic({ 
+          return processMovement({ 
             prev, 
             newPos, 
             currentRule, 

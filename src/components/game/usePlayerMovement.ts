@@ -1,7 +1,8 @@
+
 import { useCallback, useRef, useEffect } from "react";
 import { Position, GameStatus, GameRule } from "./types";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { movementLogic } from "./movementLogic";
+import { getChaseMove, processMovement } from "./movementLogic";
 import { useTouchMovement } from "./useTouchMovement";
 import { useKeyboardMovement } from "./useKeyboardMovement";
 import { isPositionEqual } from "./utils";
@@ -55,7 +56,7 @@ export const usePlayerMovement = ({
   const moveGlitches = useCallback(() => {
     setGameStatus(prev => {
       const newGlitchPositions = prev.glitchPositions.map(glitch => {
-        const nextGlitchPos = movementLogic.getChaseMove(
+        const nextGlitchPos = getChaseMove(
           glitch, 
           prev.playerPosition, 
           prev.walls
@@ -98,7 +99,7 @@ export const usePlayerMovement = ({
         let newState = { ...prev, playerPosition: nextPos };
         
         if (isPositionEqual(nextPos, target)) {
-          newState = movementLogic({
+          newState = processMovement({
             prev,
             newPos: nextPos,
             currentRule,
@@ -109,7 +110,7 @@ export const usePlayerMovement = ({
         }
         
         if (prev.glitchPositions.some(g => isPositionEqual(g, nextPos))) {
-          newState = movementLogic({
+          newState = processMovement({
             prev,
             newPos: nextPos,
             currentRule,
@@ -172,7 +173,7 @@ export const usePlayerMovement = ({
   const handleMove = useCallback(
     (newPos: Position) => {
       setGameStatus((prev) =>
-        movementLogic({ 
+        processMovement({ 
           prev, 
           newPos, 
           currentRule, 

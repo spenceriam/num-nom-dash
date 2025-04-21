@@ -2,7 +2,7 @@
 import { useRef, useCallback } from "react";
 import { Position, GameStatus, GameRule } from "./types";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { movementLogic } from "./movementLogic";
+import { processMovement } from "./movementLogic";
 
 type UseTouchMovementProps = {
   setGameStatus: React.Dispatch<React.SetStateAction<GameStatus>>;
@@ -53,7 +53,7 @@ export function useTouchMovement({
           newPos.y = Math.max(0, newPos.y - 1);
         }
       }
-      return movementLogic({
+      return processMovement({
         prev,
         newPos,
         currentRule,
