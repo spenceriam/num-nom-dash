@@ -1,3 +1,4 @@
+
 import { useCallback, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { isPositionEqual } from "./utils";
@@ -59,14 +60,16 @@ export const usePlayerMovement = ({
           updatedNumbers.splice(collectedNumberIndex, 1);
           toast.success(`+10 points!`);
         } else {
-          // Wrong number: lose a life, reset position to start.
+          // Wrong number: lose a life, reset position to start, but also remove the number
           lives -= 1;
           toast.error("Wrong number! Lost a life and reset.");
-          playerPosition = { x: 0, y: 0 }; // Reset to top-left by default
-          // Try to use the original player start, fallback to {0,0}
-          if ((prev as any).playerStart) {
-            playerPosition = (prev as any).playerStart;
-          }
+          
+          // Remove the number from the board even though it was wrong
+          updatedNumbers.splice(collectedNumberIndex, 1);
+          
+          // Reset position to the level's starting position, not just {0,0}
+          playerPosition = prev.playerStart || { x: 0, y: 0 };
+          
           // Don't allow negative lives and handle game over
           if (lives <= 0) {
             onGameOver(score);
@@ -76,6 +79,7 @@ export const usePlayerMovement = ({
             ...prev,
             lives,
             playerPosition,
+            remainingNumbers: updatedNumbers,
           };
         }
       }

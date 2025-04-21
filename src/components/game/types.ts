@@ -43,6 +43,7 @@ export type GameStatus = {
   lives: number;
   level: number;
   playerPosition: Position;
+  playerStart: Position; // Add this property to store the starting position
   glitchPositions: Position[];
   remainingNumbers: { position: Position; value: number }[];
   walls: Position[];

@@ -22,6 +22,7 @@ const Game = ({ onGameOver, level }: GameProps) => {
     lives: INITIAL_LIVES,
     level,
     playerPosition: { x: 0, y: 0 },
+    playerStart: { x: 0, y: 0 }, // Initialize playerStart
     glitchPositions: [],
     remainingNumbers: [],
     walls: []
@@ -50,6 +51,7 @@ const Game = ({ onGameOver, level }: GameProps) => {
       lives: INITIAL_LIVES,
       level,
       playerPosition: gameLevel.maze.playerStart,
+      playerStart: gameLevel.maze.playerStart, // Store the starting position
       glitchPositions: gameLevel.maze.glitches,
       remainingNumbers: gameLevel.maze.numbers,
       walls: gameLevel.maze.walls
