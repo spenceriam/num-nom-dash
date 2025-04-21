@@ -10,13 +10,18 @@ type MovementLogicParams = {
   onLevelComplete?: () => void;
 };
 
-// Get the best move for a glitch to chase the player
+// Get the best move for a glitch to chase the player with reduced speed
 export function getChaseMove(
   glitch: Position,
   playerPos: Position,
   walls: Position[],
   gridSize: number = 6
 ): Position {
+  // 70% chance to stay in place (reduces effective speed)
+  if (Math.random() < 0.7) {
+    return glitch;
+  }
+
   // Calculate differences
   const dx = playerPos.x - glitch.x;
   const dy = playerPos.y - glitch.y;
@@ -103,34 +108,6 @@ export function processMovement({
   let lives = prev.lives;
   let playerPosition = newPos;
 
-  // Check how many valid numbers remain
-  const remainingValidNumbers = currentRule ? 
-    updatedNumbers.filter(num => currentRule.isMatch(num.value)) : 
-    [];
-  
-  // Glitches will now actively seek matching numbers
-  const shouldChase = remainingValidNumbers.length > 0;
-  
-  // Move all glitches and let them consume numbers
-  let updatedGlitchPositions = prev.glitchPositions.map(glitch => {
-    const newGlitchPos = shouldChase ? 
-      getChaseMove(glitch, playerPosition, prev.walls) :
-      getRandomGlitchMove(glitch, prev.walls, playerPosition);
-
-    // Check if glitch consumes a matching number
-    const numberAtNewPos = updatedNumbers.findIndex(num => 
-      isPositionEqual(num.position, newGlitchPos) && 
-      currentRule?.isMatch(num.value)
-    );
-    
-    if (numberAtNewPos !== -1) {
-      updatedNumbers.splice(numberAtNewPos, 1);
-      toast.error("A glitch consumed a matching number!");
-    }
-    
-    return newGlitchPos;
-  });
-
   // Check if player collects a number
   const collectedNumberIndex = updatedNumbers.findIndex((num) =>
     isPositionEqual(num.position, newPos)
@@ -146,24 +123,36 @@ export function processMovement({
     } else {
       lives -= 1;
       toast.error(`Wrong number! Rule: ${currentRule?.name || 'No rule'}`);
-
       updatedNumbers.splice(collectedNumberIndex, 1);
-
       playerPosition = prev.playerStart || { x: 0, y: 0 };
 
       if (lives <= 0) {
         onGameOver(score);
         return prev;
       }
-      return {
-        ...prev,
-        lives,
-        playerPosition,
-        remainingNumbers: updatedNumbers,
-        glitchPositions: updatedGlitchPositions
-      };
     }
   }
+
+  // Move all glitches and let them randomly consume numbers
+  let updatedGlitchPositions = prev.glitchPositions.map(glitch => {
+    const newGlitchPos = getChaseMove(glitch, playerPosition, prev.walls);
+
+    // Random chance (30%) to attempt consuming a number
+    if (Math.random() < 0.3) {
+      const numberAtNewPos = updatedNumbers.findIndex(num => 
+        isPositionEqual(num.position, newGlitchPos)
+      );
+      
+      if (numberAtNewPos !== -1) {
+        updatedNumbers.splice(numberAtNewPos, 1);
+        if (currentRule?.isMatch(updatedNumbers[numberAtNewPos].value)) {
+          toast.error("A glitch consumed a matching number!");
+        }
+      }
+    }
+    
+    return newGlitchPos;
+  });
 
   // Check if there are any matching numbers left
   const remainingCorrectNumbers = updatedNumbers.filter((num) =>
@@ -181,10 +170,7 @@ export function processMovement({
       onGameOver(score);
       return prev;
     } else {
-      const message = shouldChase ? 
-        "The glitches caught you! 1 life lost" : 
-        "Hit by a glitch! 1 life lost";
-      toast.error(`${message} - ${lives} remaining`);
+      toast.error(`Hit by a glitch! 1 life lost - ${lives} remaining`);
       return {
         ...prev,
         lives,
