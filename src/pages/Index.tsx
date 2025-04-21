@@ -7,6 +7,7 @@ import StartScreen from "@/components/game/StartScreen";
 import GameOverScreen from "@/components/game/GameOverScreen";
 import { RulesDialog } from "@/components/game/RulesDialog";
 import { Sparkles } from "lucide-react";
+import { GameStatus } from "@/components/game/types";
 
 // Game states
 type GameState = "start" | "playing" | "gameOver";
@@ -25,6 +26,16 @@ const Index = () => {
     const savedLevel = sessionStorage.getItem("gameLevel");
     return savedLevel ? parseInt(savedLevel, 10) : 1;
   });
+  const [gameStatus, setGameStatus] = useState<GameStatus>({
+    score: 0,
+    lives: 3,
+    level: 1,
+    playerPosition: { x: 0, y: 0 },
+    playerStart: { x: 0, y: 0 },
+    glitchPositions: [],
+    remainingNumbers: [],
+    walls: []
+  });
 
   // Save game state to session storage when it changes
   useEffect(() => {
@@ -37,6 +48,12 @@ const Index = () => {
     setGameState("playing");
     setScore(0);
     setLevel(1);
+    setGameStatus(prev => ({
+      ...prev,
+      score: 0,
+      lives: 3,
+      level: 1
+    }));
   };
 
   const endGame = (finalScore: number) => {
@@ -46,6 +63,10 @@ const Index = () => {
 
   const restartGame = () => {
     startGame();
+  };
+
+  const updateGameStatus = (newStatus: Partial<GameStatus>) => {
+    setGameStatus(prev => ({ ...prev, ...newStatus }));
   };
 
   return (
@@ -80,7 +101,11 @@ const Index = () => {
                   </div>
                   <div className="text-purple-900 font-semibold">Score: {score}</div>
                 </div>
-                <Game onGameOver={endGame} level={level} />
+                <Game 
+                  onGameOver={endGame} 
+                  level={level}
+                  onUpdateGameStatus={updateGameStatus}
+                />
               </div>
             )}
             {gameState === "start" && <StartScreen onStart={startGame} />}

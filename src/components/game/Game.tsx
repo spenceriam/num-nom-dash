@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -12,11 +11,12 @@ import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, A
 type GameProps = {
   onGameOver: (score: number) => void;
   level: number;
+  onUpdateGameStatus?: (status: Partial<GameStatus>) => void;
 };
 
 const INITIAL_LIVES = 3;
 
-const Game = ({ onGameOver, level: initialLevel }: GameProps) => {
+const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps) => {
   const isMobile = useIsMobile();
   const [level, setLevel] = useState(initialLevel);
   const [showLevelComplete, setShowLevelComplete] = useState(false);
@@ -62,7 +62,7 @@ const Game = ({ onGameOver, level: initialLevel }: GameProps) => {
     if (!gameLevel) return;
     
     setCurrentRule(gameLevel.rule);
-    setGameStatus({
+    const initialGameStatus = {
       score: gameStatus.score, // Keep the current score
       lives: INITIAL_LIVES,
       level,
@@ -71,7 +71,10 @@ const Game = ({ onGameOver, level: initialLevel }: GameProps) => {
       glitchPositions: gameLevel.maze.glitches,
       remainingNumbers: gameLevel.maze.numbers,
       walls: gameLevel.maze.walls
-    });
+    };
+    
+    setGameStatus(initialGameStatus);
+    onUpdateGameStatus?.(initialGameStatus);
     
     toast.success(`Level ${level}: ${gameLevel.rule.name}`, {
       description: gameLevel.rule.description,
