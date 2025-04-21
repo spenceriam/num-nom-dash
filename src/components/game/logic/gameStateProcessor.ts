@@ -1,3 +1,4 @@
+
 import { GameStatus, Position, GameRule } from "../types";
 import { isPositionEqual } from "../utils";
 import { getChaseMove } from "./glitchMovement";
@@ -62,15 +63,16 @@ export function processMovement({
       updatedNumbers.length
     );
 
-    // Increased random chance (now 50%) to attempt consuming a number
-    if (Math.random() < 0.5) {
+    // Increased random chance (now 80%) to attempt consuming a number
+    if (Math.random() < 0.8) {
       const numberAtNewPos = updatedNumbers.findIndex(num => 
         isPositionEqual(num.position, newGlitchPos)
       );
       
       if (numberAtNewPos !== -1) {
+        const consumedNumber = updatedNumbers[numberAtNewPos];
         updatedNumbers.splice(numberAtNewPos, 1);
-        if (currentRule?.isMatch(updatedNumbers[numberAtNewPos]?.value)) {
+        if (currentRule?.isMatch(consumedNumber.value)) {
           toast.error("A glitch consumed a matching number!");
         }
       }
