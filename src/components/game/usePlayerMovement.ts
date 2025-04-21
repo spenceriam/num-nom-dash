@@ -168,7 +168,7 @@ export const usePlayerMovement = ({
     [moveLogic, setGameStatus]
   );
 
-  // Programmatic player movement
+  // Programmatic player movement (arrow keys and swipe)
   const movePlayer = useCallback(
     (direction: Direction) => {
       setGameStatus((prev) => {
@@ -178,13 +178,13 @@ export const usePlayerMovement = ({
             newPos.y = Math.max(0, newPos.y - 1);
             break;
           case "down":
-            newPos.y = Math.min(9, newPos.y + 1);
+            newPos.y = Math.min(5, newPos.y + 1);
             break;
           case "left":
             newPos.x = Math.max(0, newPos.x - 1);
             break;
           case "right":
-            newPos.x = Math.min(9, newPos.x + 1);
+            newPos.x = Math.min(5, newPos.x + 1);
             break;
         }
         return moveLogic(prev, newPos);

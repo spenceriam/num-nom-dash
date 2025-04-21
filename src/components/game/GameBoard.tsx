@@ -13,11 +13,11 @@ type GameBoardProps = {
 const isAdjacent = (player: Position, cell: Position) => {
   const dx = Math.abs(player.x - cell.x);
   const dy = Math.abs(player.y - cell.y);
-  return (dx + dy === 1);
+  return dx + dy === 1;
 };
 
 export const GameBoard = ({ playerPosition, glitchPositions, walls, numbers, onCellClick }: GameBoardProps) => {
-  const boardSize = 10; // 10x10 grid
+  const boardSize = 6; // 6x6 grid
   const cells = [];
   
   for (let y = 0; y < boardSize; y++) {
@@ -91,7 +91,7 @@ export const GameBoard = ({ playerPosition, glitchPositions, walls, numbers, onC
   
   return (
     <div 
-      className="grid grid-cols-10 gap-1 bg-purple-100 p-1 rounded-lg shadow-inner"
+      className="grid grid-cols-6 gap-1 bg-purple-100 p-1 rounded-lg shadow-inner"
       style={{ aspectRatio: '1/1' }}
     >
       {cells}
