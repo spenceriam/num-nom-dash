@@ -85,8 +85,7 @@ const GameOverScreen = ({ score, onRestart }: GameOverScreenProps) => {
             </Button>
             <Button
               onClick={handleHome}
-              variant="secondary"
-              className="flex-1 bg-[#89C2D9]/20 text-[#012A4A] hover:bg-[#89C2D9]/30"
+              className="flex-1 bg-gradient-to-r from-[#012A4A] to-[#014F86] text-white hover:opacity-90 transition-opacity"
             >
               <Home className="mr-2" /> Home
             </Button>
@@ -98,4 +97,3 @@ const GameOverScreen = ({ score, onRestart }: GameOverScreenProps) => {
 };
 
 export default GameOverScreen;
-
