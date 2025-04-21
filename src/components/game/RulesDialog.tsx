@@ -8,7 +8,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Circle, Bug } from "lucide-react";
 
 export function RulesDialog() {
   return (
@@ -28,7 +28,9 @@ export function RulesDialog() {
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <h4 className="font-semibold mb-2 text-purple-800">Basic Rules:</h4>
+            <h4 className="font-semibold mb-2 text-purple-800 flex items-center gap-2">
+              <Circle className="text-green-500" size={20} /> Num Nom (You)
+            </h4>
             <ul className="list-disc pl-5 space-y-2 text-sm">
               <li>Use arrow keys or swipe to move Num Nom around the maze</li>
               <li>Each level has a specific rule for which numbers you need to collect</li>
@@ -41,11 +43,12 @@ export function RulesDialog() {
             <ul className="list-disc pl-5 space-y-2 text-sm">
               <li>Complete each level by collecting all numbers that match the rule</li>
               <li>Plan your moves carefully to avoid wrong numbers</li>
-              <li>Complete levels quickly for a better score - time counts!</li>
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-2 text-purple-800">Watch Out For:</h4>
+            <h4 className="font-semibold mb-2 text-purple-800 flex items-center gap-2">
+              <Bug className="text-red-500" size={20} /> Glitches
+            </h4>
             <ul className="list-disc pl-5 space-y-2 text-sm">
               <li>Glitches will cost you a life if you touch them</li>
               <li>When only one valid number remains, glitches will chase you!</li>
