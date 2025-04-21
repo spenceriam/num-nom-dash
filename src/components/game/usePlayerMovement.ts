@@ -1,9 +1,11 @@
+
 import { useCallback } from "react";
 import { Position, GameStatus, GameRule } from "./types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { movementLogic } from "./movementLogic";
 import { useTouchMovement } from "./useTouchMovement";
 import { useKeyboardMovement } from "./useKeyboardMovement";
+import { isPositionEqual } from "./utils";
 
 export type UsePlayerMovementProps = {
   gameStatus: GameStatus;
