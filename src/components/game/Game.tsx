@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -43,6 +44,13 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
       setLevel(prev => prev + 1);
       setShowLevelComplete(false);
     }
+  };
+  
+  const handleNewGame = () => {
+    // Reset to level 1
+    gameInitializedRef.current = false;
+    setLevel(1);
+    onGameOver(gameStatus.score);
   };
 
   const {
@@ -170,7 +178,7 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
       
       <div className="mt-6 flex justify-center">
         <Button 
-          onClick={() => onGameOver(gameStatus.score)}
+          onClick={handleNewGame}
           className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-2 rounded-full hover:opacity-90 transition-opacity"
         >
           New Game

@@ -135,45 +135,66 @@ export const generateEasyMaze = (
     !isPositionEqual(pos, glitchPos)
   );
 
-  // Ensure at least 3 rule-matching numbers around the player
+  // MODIFIED: Ensure at least 5 rule-matching numbers around the player for level 1
+  // This guarantees more solvable puzzles
   let ruleMatchingAdded = 0;
+  const minRuleMatchingCount = 5;
+  
+  // First add rule-matching numbers in adjacent positions
   for (const pos of adjacentPositions) {
-    if (ruleMatchingAdded >= 3) break;
+    if (ruleMatchingAdded >= minRuleMatchingCount) break;
     
-    let value, tries = 0;
-    do {
-      value = Math.floor(Math.random() * 99) + 1;
-      tries++;
-      if (tries > 30) break;
-    } while (!rule(value) || hasDuplicateNeighbor(pos, value, numbers, gridSize));
+    // Generate even or rule-matching numbers more consistently
+    const createValue = () => {
+      if (rule === rules.evenNumbers.isMatch) {
+        // For even numbers rule (level 1), explicitly create even numbers
+        return Math.floor(Math.random() * 50) * 2; // Guarantees an even number
+      } else {
+        // For other rules, try to get matching numbers
+        let val, attempts = 0;
+        do {
+          val = Math.floor(Math.random() * 99) + 1;
+          attempts++;
+          if (attempts > 30) break;
+        } while (!rule(val));
+        return val;
+      }
+    };
     
-    if (rule(value)) {
-      numbers.push({ position: pos, value });
-      ruleMatchingAdded++;
-    }
+    const value = createValue();
+    numbers.push({ position: pos, value });
+    ruleMatchingAdded++;
   }
 
   // Get edge and corner positions for guaranteed rule-matching numbers
   const excludePositions = [playerStart, glitchPos, ...numbers.map(n => n.position)];
   const accessiblePositions = getAccessiblePositions(gridSize, excludePositions);
   
-  // Add rule-matching numbers to accessible positions
-  const accessibleMatchingCount = Math.min(3, accessiblePositions.length);
-  for (let i = 0; i < accessibleMatchingCount; i++) {
-    if (accessiblePositions.length === 0) break;
-    
+  // Add more rule-matching numbers to accessible positions if needed
+  while (ruleMatchingAdded < minRuleMatchingCount && accessiblePositions.length > 0) {
     const posIndex = Math.floor(Math.random() * accessiblePositions.length);
     const position = accessiblePositions[posIndex];
     accessiblePositions.splice(posIndex, 1);
     
-    let value, tries = 0;
-    do {
-      value = Math.floor(Math.random() * 99) + 1;
-      tries++;
-      if (tries > 30) break;
-    } while (!rule(value) || hasDuplicateNeighbor(position, value, numbers, gridSize));
+    const createValue = () => {
+      if (rule === rules.evenNumbers.isMatch) {
+        // For even numbers rule (level 1), explicitly create even numbers
+        return Math.floor(Math.random() * 50) * 2; // Guarantees an even number
+      } else {
+        // For other rules, try to get matching numbers
+        let val, attempts = 0;
+        do {
+          val = Math.floor(Math.random() * 99) + 1;
+          attempts++;
+          if (attempts > 30) break; 
+        } while (!rule(val));
+        return val;
+      }
+    };
     
+    const value = createValue();
     numbers.push({ position, value });
+    ruleMatchingAdded++;
   }
 
   // Fill the rest of the grid with non-rule-matching numbers
