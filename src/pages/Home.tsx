@@ -16,28 +16,26 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="space-y-4">
-            <div className="bg-purple-100 p-4 rounded-lg">
-              <h2 className="font-semibold text-purple-800 mb-2">About the Game</h2>
-              <p className="text-gray-700 text-sm">
-                Guide Num Nom through mazes while collecting numbers that match specific rules. 
-                Watch out for Glitches that will try to stop you! Can you master all the levels?
-              </p>
-            </div>
+          <div className="bg-purple-100 p-4 rounded-lg">
+            <h2 className="font-semibold text-purple-800 mb-2">About the Game</h2>
+            <p className="text-gray-700 text-sm">
+              Guide Num Nom through mazes while collecting numbers that match specific rules. 
+              Watch out for Glitches that will try to stop you! Can you master all the levels?
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <Link to="/play" className="w-full">
+              <Button className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-lg py-6">
+                Play Game
+              </Button>
+            </Link>
             
-            <div className="flex flex-col gap-4">
-              <Link to="/play">
-                <Button className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-lg py-6">
-                  Play Game
-                </Button>
+            <div className="flex justify-between gap-2">
+              <RulesDialog />
+              <Link to="/high-scores">
+                <Button variant="secondary">High Scores</Button>
               </Link>
-              
-              <div className="flex justify-between gap-2">
-                <RulesDialog />
-                <Link to="/high-scores">
-                  <Button variant="secondary">High Scores</Button>
-                </Link>
-              </div>
             </div>
           </div>
         </CardContent>
