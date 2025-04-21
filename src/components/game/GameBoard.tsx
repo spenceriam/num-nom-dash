@@ -1,6 +1,6 @@
 import { Position, GameRule } from "./types";
 import { isPositionEqual } from "./utils";
-import { Bug } from "lucide-react";
+import { Bug, Sparkles } from "lucide-react";
 
 type GameBoardProps = {
   playerPosition: Position;
@@ -48,7 +48,7 @@ export const GameBoard = ({
         cellClass += " bg-green-500";
         cellContent = (
           <div className="w-4/5 h-4/5 rounded-full bg-green-700 flex items-center justify-center text-white font-bold shadow-md">
-            N
+            <Sparkles className="w-2/3 h-2/3 text-white" strokeWidth={2.5} />
           </div>
         );
       } else if (isGlitch) {

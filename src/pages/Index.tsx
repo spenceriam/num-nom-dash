@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,6 +6,7 @@ import Game from "@/components/game/Game";
 import StartScreen from "@/components/game/StartScreen";
 import GameOverScreen from "@/components/game/GameOverScreen";
 import { RulesDialog } from "@/components/game/RulesDialog";
+import { Sparkles } from "lucide-react";
 
 // Game states
 type GameState = "start" | "playing" | "gameOver";
@@ -65,8 +65,25 @@ const Index = () => {
           </div>
           
           <div className="p-4">
+            {gameState === "playing" && (
+              <div>
+                <div className="flex justify-between items-center mb-4">
+                  <div className="text-purple-900 font-semibold">Level: {level}</div>
+                  <div className="text-purple-900 font-semibold flex items-center gap-1">
+                    Lives: {Array.from({ length: gameStatus.lives }).map((_, i) => (
+                      <Sparkles 
+                        key={i}
+                        className="w-5 h-5 text-green-700" 
+                        strokeWidth={2.5}
+                      />
+                    ))}
+                  </div>
+                  <div className="text-purple-900 font-semibold">Score: {score}</div>
+                </div>
+                <Game onGameOver={endGame} level={level} />
+              </div>
+            )}
             {gameState === "start" && <StartScreen onStart={startGame} />}
-            {gameState === "playing" && <Game onGameOver={endGame} level={level} />}
             {gameState === "gameOver" && <GameOverScreen score={score} onRestart={restartGame} />}
           </div>
         </CardContent>
