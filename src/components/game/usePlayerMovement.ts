@@ -71,15 +71,27 @@ export const usePlayerMovement = ({
     });
   }, [setGameStatus]);
 
-  useEffect(() => {
+  const stopGlitchMovement = useCallback(() => {
+    if (glitchIntervalRef.current) {
+      clearInterval(glitchIntervalRef.current);
+      glitchIntervalRef.current = undefined;
+    }
+  }, []);
+
+  const startGlitchMovement = useCallback(() => {
+    stopGlitchMovement();
     glitchIntervalRef.current = window.setInterval(moveGlitches, 1560);
-    
-    return () => {
-      if (glitchIntervalRef.current) {
-        clearInterval(glitchIntervalRef.current);
-      }
-    };
-  }, [moveGlitches]);
+  }, [moveGlitches, stopGlitchMovement]);
+
+  useEffect(() => {
+    startGlitchMovement();
+    return () => stopGlitchMovement();
+  }, [gameStatus.level, startGlitchMovement, stopGlitchMovement]);
+
+  const wrappedLevelComplete = useCallback(() => {
+    stopGlitchMovement();
+    onLevelComplete?.();
+  }, [onLevelComplete, stopGlitchMovement]);
 
   const startMovement = (target: Position) => {
     if (moveIntervalRef.current) {
@@ -152,7 +164,7 @@ export const usePlayerMovement = ({
     );
     
     if (remainingCorrectNumbers.length === 0 && gameStatus.remainingNumbers.length > 0) {
-      onLevelComplete?.();
+      wrappedLevelComplete();
     }
   }, [gameStatus.remainingNumbers, currentRule, onLevelComplete]);
 
