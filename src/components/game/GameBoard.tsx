@@ -38,7 +38,7 @@ export const GameBoard = ({
       const number = numbers.find(n => isPositionEqual(n.position, position));
       
       let cellContent;
-      let cellClass = "w-full h-full flex items-center justify-center bg-white border border-purple-200";
+      let cellClass = "w-full h-full flex items-center justify-center bg-white border border-[#014F86]/20";
       let isClickable = false;
 
       if (isWall) {
@@ -60,18 +60,18 @@ export const GameBoard = ({
         );
       } else if (number) {
         cellContent = (
-          <span className="text-purple-900 font-bold text-lg">
+          <span className="text-[#012A4A] font-bold text-lg">
             {number.value}
           </span>
         );
       } else {
-        cellClass += " bg-purple-50";
+        cellClass += " bg-white/80";
       }
 
       if (onCellClick && !isWall && !isPlayer && !isGlitch) {
         if (isAdjacent(playerPosition, position)) {
           isClickable = true;
-          cellClass += " cursor-pointer hover:bg-green-100 hover:ring-2 hover:ring-green-400 transition-all";
+          cellClass += " cursor-pointer hover:bg-[#89C2D9]/20 hover:ring-2 hover:ring-[#014F86] transition-all";
         }
       }
 
@@ -98,7 +98,7 @@ export const GameBoard = ({
   }
   
   return (
-    <div className="w-full bg-purple-100 p-1 rounded-lg shadow-inner" style={{ aspectRatio: '1/1' }}>
+    <div className="w-full bg-white/80 backdrop-blur-sm p-1 rounded-lg shadow-inner" style={{ aspectRatio: '1/1' }}>
       {rows}
     </div>
   );
