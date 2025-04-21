@@ -54,13 +54,20 @@ export function processMovement({
     }
   }
 
+  // Check if there are any matching numbers left to determine if glitches should chase
+  const remainingCorrectNumbers = updatedNumbers.filter((num) =>
+    currentRule?.isMatch(num.value)
+  );
+  
+  const shouldChase = remainingCorrectNumbers.length <= 1;
+
   // Move all glitches and let them consume numbers
   let updatedGlitchPositions = prev.glitchPositions.map(glitch => {
     const newGlitchPos = getChaseMove(
       glitch, 
       playerPosition, 
       prev.walls,
-      updatedNumbers.length
+      shouldChase ? 1 : updatedNumbers.length
     );
 
     // Increased random chance (now 80%) to attempt consuming a number
@@ -81,12 +88,12 @@ export function processMovement({
     return newGlitchPos;
   });
 
-  // Check if there are any matching numbers left
-  const remainingCorrectNumbers = updatedNumbers.filter((num) =>
+  // Check if there are any matching numbers left after glitch movement
+  const remainingCorrectNumbersAfterGlitch = updatedNumbers.filter((num) =>
     currentRule?.isMatch(num.value)
   );
 
-  if (remainingCorrectNumbers.length === 0 && updatedNumbers.length > 0 && currentRule) {
+  if (remainingCorrectNumbersAfterGlitch.length === 0 && updatedNumbers.length > 0 && currentRule) {
     onLevelComplete?.();
   }
 

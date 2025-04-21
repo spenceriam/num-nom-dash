@@ -48,8 +48,8 @@ function getChasePlayerMove(
   walls: Position[],
   gridSize: number = 6
 ): Position {
-  // 70% chance to stay in place (reduces effective speed)
-  if (Math.random() < 0.7) {
+  // Reduced chance to stay in place from 70% to 30% (increases effective chase speed)
+  if (Math.random() < 0.3) {
     return glitch;
   }
 
@@ -100,7 +100,7 @@ export function getChaseMove(
   remainingNumbersCount: number,
   gridSize: number = 6
 ): Position {
-  // Only chase player when 1 number remains, otherwise move randomly
+  // Chase player when 1 or 0 numbers remain, otherwise move randomly
   if (remainingNumbersCount <= 1) {
     return getChasePlayerMove(glitch, playerPos, walls, gridSize);
   }
