@@ -1,4 +1,3 @@
-
 import { Position } from "./types";
 
 export const isPositionEqual = (pos1: Position, pos2: Position): boolean => {
@@ -48,6 +47,11 @@ function hasDuplicateNeighbor(position: Position, value: string, expressions: { 
   );
 }
 
+// Helper to generate a random number within range
+function generateRandomNumber(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 // Helper to generate expressions that equal to a target value
 function generateExpressionEqualsTo(target: number): string {
   const operations = ['+', '-', '*', '/'];
@@ -95,7 +99,6 @@ function generateNonMatchingExpression(target: number): string {
   return generateExpressionEqualsTo(randomValue);
 }
 
-// Generates a 6x6 grid with string-based expressions
 export const generateRandomMaze = (width: number, height: number) => {
   const gridSize = 6;
   const walls: Position[] = [];
@@ -114,23 +117,15 @@ export const generateRandomMaze = (width: number, height: number) => {
 
   const glitches = [glitchPos];
 
-  // Fill all cells (except player position and glitch) with expressions
+  // Fill all cells with expressions
   const numbers: { position: Position; value: string }[] = [];
   for (let y = 0; y < gridSize; y++) {
     for (let x = 0; x < gridSize; x++) {
       const position = { x, y };
       if (!isPositionEqual(position, playerStart) && !isPositionEqual(position, glitchPos)) {
-        // Generate various expressions like 5+5, 12-2, 2*5, 10/2
-        const possibleExpressions = [
-          `${Math.floor(Math.random() * 10)}+${Math.floor(Math.random() * 10)}`,
-          `${Math.floor(Math.random() * 20)}-${Math.floor(Math.random() * 10)}`,
-          `${Math.floor(Math.random() * 5)}*${Math.floor(Math.random() * 5)}`,
-          `${Math.floor(Math.random() * 10) * (Math.floor(Math.random() * 5) + 1)}/${Math.floor(Math.random() * 5) + 1}`
-        ];
-        
         numbers.push({
           position,
-          value: possibleExpressions[Math.floor(Math.random() * possibleExpressions.length)]
+          value: generateRandomNumber(1, 20).toString()
         });
       }
     }
@@ -146,24 +141,19 @@ export const generateRandomMaze = (width: number, height: number) => {
   };
 };
 
-// Generate a 6x6 maze with expressions that match a specific rule
 export const generateEasyMaze = (
-  width: number,
+  width: number, 
   height: number,
-  rule: (expression: string) => boolean
+  rule: (expression: string) => boolean,
+  useExpressions: boolean = false
 ) => {
   const gridSize = 6;
   const walls: Position[] = [];
-  
-  // Player starts in a corner
   const playerStart = { x: 0, y: 0 };
-
-  // Add one glitch in the opposite corner
   const glitchPos = { x: gridSize - 1, y: gridSize - 1 };
   const glitches = [glitchPos];
   const numbers: { position: Position; value: string }[] = [];
   
-  // Get all available positions
   const allPositions: Position[] = [];
   for (let y = 0; y < gridSize; y++) {
     for (let x = 0; x < gridSize; x++) {
@@ -174,82 +164,73 @@ export const generateEasyMaze = (
     }
   }
 
-  // Shuffle available positions
+  // Shuffle positions
   for (let i = allPositions.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [allPositions[i], allPositions[j]] = [allPositions[j], allPositions[i]];
   }
 
-  // Add rule-matching expressions (minimum 5)
+  // Add rule-matching numbers/expressions
   const minRuleMatchingCount = 5;
   let ruleMatchingAdded = 0;
-  const targetValue = 5; // Use 5 as default target for demo
 
   while (ruleMatchingAdded < minRuleMatchingCount && allPositions.length > 0) {
     const position = allPositions.pop()!;
-    
-    // Generate expressions based on the current rule
-    let expression = "";
-    if (rule.toString().includes("equalsTo5")) {
-      expression = generateExpressionEqualsTo(5);
-    } else if (rule.toString().includes("equalsTo10")) {
-      expression = generateExpressionEqualsTo(10);
-    } else if (rule.toString().includes("equalsTo15")) {
-      expression = generateExpressionEqualsTo(15);
-    } else if (rule.toString().includes("equalsTo20")) {
-      expression = generateExpressionEqualsTo(20);
-    } else if (rule.toString().includes("multiplyTo12")) {
-      expression = `${Math.floor(Math.random() * 4) + 1}*${12 / (Math.floor(Math.random() * 4) + 1)}`;
-    } else if (rule.toString().includes("divideToWhole")) {
-      const divisor = Math.floor(Math.random() * 5) + 1;
-      const dividend = divisor * (Math.floor(Math.random() * 10) + 1);
-      expression = `${dividend}/${divisor}`;
+    let value: string;
+
+    if (useExpressions) {
+      if (rule.toString().includes("equalsTo10")) {
+        value = generateExpressionEqualsTo(10);
+      } else if (rule.toString().includes("equalsTo15")) {
+        value = generateExpressionEqualsTo(15);
+      } else if (rule.toString().includes("multiplyTo12")) {
+        value = `${Math.floor(Math.random() * 4) + 1}*${12 / (Math.floor(Math.random() * 4) + 1)}`;
+      } else {
+        value = generateExpressionEqualsTo(10); // fallback
+      }
     } else {
-      // Fallback
-      expression = generateExpressionEqualsTo(targetValue);
+      // For levels 1-3, generate simple numbers
+      if (rule.toString().includes("evens")) {
+        value = (generateRandomNumber(1, 10) * 2).toString();
+      } else if (rule.toString().includes("odds")) {
+        value = (generateRandomNumber(0, 9) * 2 + 1).toString();
+      } else if (rule.toString().includes("factorOf9")) {
+        const factors = [1, 3, 9];
+        value = factors[Math.floor(Math.random() * factors.length)].toString();
+      } else {
+        value = generateRandomNumber(1, 20).toString();
+      }
     }
     
-    numbers.push({ position, value: expression });
+    numbers.push({ position, value });
     ruleMatchingAdded++;
   }
 
-  // Fill remaining positions with non-matching expressions
+  // Fill remaining positions with non-matching values
   while (allPositions.length > 0) {
     const position = allPositions.pop()!;
-    let expression = "";
-    let tries = 0;
-    
-    do {
-      if (rule.toString().includes("equalsTo5")) {
-        expression = generateNonMatchingExpression(5);
-      } else if (rule.toString().includes("equalsTo10")) {
-        expression = generateNonMatchingExpression(10);
-      } else if (rule.toString().includes("equalsTo15")) {
-        expression = generateNonMatchingExpression(15);
-      } else if (rule.toString().includes("equalsTo20")) {
-        expression = generateNonMatchingExpression(20);
-      } else if (rule.toString().includes("multiplyTo12")) {
-        // Generate expression that doesn't multiply to 12
-        const nonTwelveProduct = 12 + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 5) + 1);
-        expression = `${Math.floor(Math.random() * 4) + 1}*${nonTwelveProduct / (Math.floor(Math.random() * 4) + 1)}`;
-      } else if (rule.toString().includes("divideToWhole")) {
-        // Generate expression that doesn't divide evenly
-        const divisor = Math.floor(Math.random() * 5) + 2;
-        const dividend = divisor * (Math.floor(Math.random() * 10) + 1) + 1;
-        expression = `${dividend}/${divisor}`;
+    let value: string;
+
+    if (useExpressions) {
+      value = generateNonMatchingExpression(10);
+    } else {
+      // For levels 1-3, generate simple non-matching numbers
+      if (rule.toString().includes("evens")) {
+        value = (generateRandomNumber(0, 9) * 2 + 1).toString();
+      } else if (rule.toString().includes("odds")) {
+        value = (generateRandomNumber(1, 10) * 2).toString();
+      } else if (rule.toString().includes("factorOf9")) {
+        let num;
+        do {
+          num = generateRandomNumber(2, 8);
+        } while (9 % num === 0);
+        value = num.toString();
       } else {
-        // Fallback
-        expression = generateNonMatchingExpression(targetValue);
+        value = generateRandomNumber(1, 20).toString();
       }
-      
-      tries++;
-      if (tries > 30) break;
-    } while (
-      rule(expression) || 
-      hasDuplicateNeighbor(position, expression, numbers, gridSize)
-    );
+    }
     
-    numbers.push({ position, value: expression });
+    numbers.push({ position, value });
   }
 
   return {
