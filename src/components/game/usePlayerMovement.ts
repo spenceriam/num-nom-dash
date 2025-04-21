@@ -1,4 +1,3 @@
-
 import { useCallback, useRef, useEffect } from "react";
 import { Position, GameStatus, GameRule } from "./types";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -59,7 +58,8 @@ export const usePlayerMovement = ({
         const nextGlitchPos = getChaseMove(
           glitch, 
           prev.playerPosition, 
-          prev.walls
+          prev.walls,
+          prev.remainingNumbers.length
         );
         return nextGlitchPos;
       });
