@@ -73,18 +73,35 @@ export const usePlayerMovement = ({
           return prev;
         }
         
-        // Apply movement logic (which handles number collection and other game rules)
-        const newState = movementLogic({
-          prev,
-          newPos: nextPos,
-          currentRule,
-          onGameOver,
-          onLevelComplete
-        });
+        // During movement, only update position without collecting numbers
+        let newState = { ...prev, playerPosition: nextPos };
         
-        // Stop if we reached the target or died
-        if (isPositionEqual(newState.playerPosition, target) || newState.lives < prev.lives) {
+        // If we've reached the final target, apply full movement logic (collect numbers, check game rules)
+        if (isPositionEqual(nextPos, target)) {
+          newState = movementLogic({
+            prev,
+            newPos: nextPos,
+            currentRule,
+            onGameOver,
+            onLevelComplete
+          });
+          
           stopMovement();
+        }
+        
+        // Check if we died due to hitting a glitch during movement
+        if (prev.glitchPositions.some(g => isPositionEqual(g, nextPos))) {
+          newState = movementLogic({
+            prev,
+            newPos: nextPos,
+            currentRule,
+            onGameOver,
+            onLevelComplete
+          });
+          
+          if (newState.lives < prev.lives) {
+            stopMovement();
+          }
         }
         
         return newState;
