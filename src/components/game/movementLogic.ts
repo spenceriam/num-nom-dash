@@ -23,7 +23,7 @@ export function movementLogic({
   let updatedNumbers = [...prev.remainingNumbers];
   let score = prev.score;
   let lives = prev.lives;
-  let playerPosition = newPos; // Assume successful move unless wrong number or glitch
+  let playerPosition = newPos; 
 
   const collectedNumberIndex = updatedNumbers.findIndex((num) =>
     isPositionEqual(num.position, newPos)
@@ -32,14 +32,15 @@ export function movementLogic({
   if (collectedNumberIndex !== -1) {
     const collectedNumber = updatedNumbers[collectedNumberIndex];
 
-    if (currentRule?.isMatch(collectedNumber.value)) {
+    // Strictly check the current rule before awarding points
+    if (currentRule && currentRule.isMatch(collectedNumber.value)) {
       score += 10;
       updatedNumbers.splice(collectedNumberIndex, 1);
       toast.success(`+10 points!`);
     } else {
       // Wrong number: lose a life, reset position to start, and remove the number
       lives -= 1;
-      toast.error("Wrong number! Lost a life and reset.");
+      toast.error(`Wrong number! Rule: ${currentRule?.name || 'No rule'}`);
 
       updatedNumbers.splice(collectedNumberIndex, 1);
 
