@@ -9,6 +9,7 @@ import { GameHeader } from "./components/GameHeader";
 import { RuleDisplay } from "./components/RuleDisplay";
 import { GameFooter } from "./components/GameFooter";
 import { LevelCompleteDialog } from "./components/LevelCompleteDialog";
+import { useNavigate } from "react-router-dom";
 
 type GameProps = {
   onGameOver: (score: number) => void;
@@ -35,6 +36,7 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
   const [currentRule, setCurrentRule] = useState<GameRule | null>(null);
   const gameLoopRef = useRef<number | null>(null);
   const gameInitializedRef = useRef(false);
+  const navigate = useNavigate();
 
   const handleLevelComplete = () => {
     if (level >= levels.length) {
@@ -46,9 +48,7 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
   };
   
   const handleNewGame = () => {
-    gameInitializedRef.current = false;
-    setLevel(1);
-    onGameOver(gameStatus.score);
+    navigate("/");
   };
 
   const {
