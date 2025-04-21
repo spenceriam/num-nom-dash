@@ -9,6 +9,7 @@ type UseTouchMovementProps = {
   gameStatus: GameStatus;
   currentRule: GameRule | null;
   onGameOver: (score: number) => void;
+  onLevelComplete?: () => void;
 };
 
 export function useTouchMovement({
@@ -16,6 +17,7 @@ export function useTouchMovement({
   gameStatus,
   currentRule,
   onGameOver,
+  onLevelComplete,
 }: UseTouchMovementProps) {
   const isMobile = useIsMobile();
   const touchStartRef = useRef<Position | null>(null);
@@ -56,11 +58,12 @@ export function useTouchMovement({
         newPos,
         currentRule,
         onGameOver,
+        onLevelComplete,
       });
     });
 
     touchStartRef.current = null;
-  }, [isMobile, currentRule, onGameOver, setGameStatus]);
+  }, [isMobile, currentRule, onGameOver, setGameStatus, onLevelComplete]);
 
   return {
     handleTouchStart,

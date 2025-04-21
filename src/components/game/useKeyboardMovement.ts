@@ -8,6 +8,7 @@ type UseKeyboardMovementProps = {
   gameStatus: GameStatus;
   currentRule: GameRule | null;
   onGameOver: (score: number) => void;
+  onLevelComplete?: () => void;
 };
 
 export function useKeyboardMovement({
@@ -15,6 +16,7 @@ export function useKeyboardMovement({
   gameStatus,
   currentRule,
   onGameOver,
+  onLevelComplete,
 }: UseKeyboardMovementProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -69,7 +71,13 @@ export function useKeyboardMovement({
               newPos.x = Math.min(5, newPos.x + 1);
               break;
           }
-          return movementLogic({ prev, newPos, currentRule, onGameOver });
+          return movementLogic({ 
+            prev, 
+            newPos, 
+            currentRule, 
+            onGameOver,
+            onLevelComplete 
+          });
         });
         e.preventDefault();
       } else if (diagonal) {
@@ -79,7 +87,13 @@ export function useKeyboardMovement({
             x: Math.max(0, Math.min(5, playerPosition.x + diagonal!.dx)),
             y: Math.max(0, Math.min(5, playerPosition.y + diagonal!.dy)),
           };
-          return movementLogic({ prev, newPos, currentRule, onGameOver });
+          return movementLogic({ 
+            prev, 
+            newPos, 
+            currentRule, 
+            onGameOver,
+            onLevelComplete 
+          });
         });
         e.preventDefault();
       }
@@ -88,5 +102,5 @@ export function useKeyboardMovement({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
     // eslint-disable-next-line
-  }, [gameStatus, currentRule, onGameOver, setGameStatus]);
+  }, [gameStatus, currentRule, onGameOver, setGameStatus, onLevelComplete]);
 }
