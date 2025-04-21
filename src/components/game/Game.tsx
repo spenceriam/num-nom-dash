@@ -32,6 +32,7 @@ const Game = ({ onGameOver, level: initialLevel }: GameProps) => {
   });
   const [currentRule, setCurrentRule] = useState<GameRule | null>(null);
   const gameLoopRef = useRef<number | null>(null);
+  const gameInitializedRef = useRef(false);
 
   const handleLevelComplete = () => {
     if (level >= levels.length) {
@@ -55,6 +56,8 @@ const Game = ({ onGameOver, level: initialLevel }: GameProps) => {
   });
 
   useEffect(() => {
+    if (gameInitializedRef.current) return;
+    
     const gameLevel = levels.find(l => l.id === level);
     if (!gameLevel) return;
     
@@ -74,11 +77,37 @@ const Game = ({ onGameOver, level: initialLevel }: GameProps) => {
       description: gameLevel.rule.description,
     });
     
+    gameInitializedRef.current = true;
+    
     return () => {
       if (gameLoopRef.current) {
         cancelAnimationFrame(gameLoopRef.current);
       }
     };
+  }, [level]);
+  
+  // Only initialize a new level when the level actually changes
+  useEffect(() => {
+    if (!gameInitializedRef.current) return;
+    
+    const gameLevel = levels.find(l => l.id === level);
+    if (!gameLevel) return;
+    
+    setCurrentRule(gameLevel.rule);
+    setGameStatus(prev => ({
+      score: prev.score, // Keep the current score
+      lives: INITIAL_LIVES,
+      level,
+      playerPosition: gameLevel.maze.playerStart,
+      playerStart: gameLevel.maze.playerStart,
+      glitchPositions: gameLevel.maze.glitches,
+      remainingNumbers: gameLevel.maze.numbers,
+      walls: gameLevel.maze.walls
+    }));
+    
+    toast.success(`Level ${level}: ${gameLevel.rule.name}`, {
+      description: gameLevel.rule.description,
+    });
   }, [level]);
 
   // Count remaining matching numbers for debugging

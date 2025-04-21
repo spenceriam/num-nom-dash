@@ -1,3 +1,4 @@
+
 import { Position } from "./types";
 
 export const isPositionEqual = (pos1: Position, pos2: Position): boolean => {
@@ -35,6 +36,16 @@ function getAccessiblePositions(gridSize: number, excludePositions: Position[]) 
   }
   
   return accessiblePositions;
+}
+
+// Check if a position has a neighbor with the same value
+function hasDuplicateNeighbor(position: Position, value: number, numbers: { position: Position; value: number }[], gridSize: number) {
+  const neighbors = getNeighbors(position, gridSize);
+  return neighbors.some(neighborPos => 
+    numbers.some(num => 
+      isPositionEqual(num.position, neighborPos) && num.value === value
+    )
+  );
 }
 
 // Generates a 6x6 grid with no walls, a player, and one glitch
@@ -108,8 +119,8 @@ export const generateEasyMaze = (
   const glitches = [glitchPos];
   const numbers: { position: Position; value: number }[] = [];
   
-  // Positions near the player to prioritize rule-matching numbers
-  const priorityPositions = [
+  // Positions near the player for priority rule-matching numbers
+  const adjacentPositions = [
     { x: playerStart.x - 1, y: playerStart.y - 1 },
     { x: playerStart.x, y: playerStart.y - 1 },
     { x: playerStart.x + 1, y: playerStart.y - 1 },
@@ -118,34 +129,54 @@ export const generateEasyMaze = (
     { x: playerStart.x - 1, y: playerStart.y + 1 },
     { x: playerStart.x, y: playerStart.y + 1 },
     { x: playerStart.x + 1, y: playerStart.y + 1 }
-  ];
-
-  // Ensure at least some rule-matching numbers are near the player
-  const rulePriorityPositions = priorityPositions.filter(pos => 
-    pos.x >= 0 && pos.x < gridSize && pos.y >= 0 && pos.y < gridSize
+  ].filter(pos => 
+    pos.x >= 0 && pos.x < gridSize && 
+    pos.y >= 0 && pos.y < gridSize && 
+    !isPositionEqual(pos, glitchPos)
   );
 
-  let ruleMatchingNumbersAdded = 0;
-  for (const pos of rulePriorityPositions) {
-    if (ruleMatchingNumbersAdded >= 3) break;
-    if (!isPositionEqual(pos, glitchPos)) {
-      let value, tries = 0;
-      do {
-        value = Math.floor(Math.random() * 50) * 2 + 2; // Even numbers
-        tries++;
-        if (tries > 30) break;
-      } while (!rule(value) || 
-        numbers.some(n => n.value === value && isPositionEqual(n.position, pos))
-      );
-      
-      if (rule(value)) {
-        numbers.push({ position: pos, value });
-        ruleMatchingNumbersAdded++;
-      }
+  // Ensure at least 3 rule-matching numbers around the player
+  let ruleMatchingAdded = 0;
+  for (const pos of adjacentPositions) {
+    if (ruleMatchingAdded >= 3) break;
+    
+    let value, tries = 0;
+    do {
+      value = Math.floor(Math.random() * 99) + 1;
+      tries++;
+      if (tries > 30) break;
+    } while (!rule(value) || hasDuplicateNeighbor(pos, value, numbers, gridSize));
+    
+    if (rule(value)) {
+      numbers.push({ position: pos, value });
+      ruleMatchingAdded++;
     }
   }
 
-  // Fill the rest of the grid
+  // Get edge and corner positions for guaranteed rule-matching numbers
+  const excludePositions = [playerStart, glitchPos, ...numbers.map(n => n.position)];
+  const accessiblePositions = getAccessiblePositions(gridSize, excludePositions);
+  
+  // Add rule-matching numbers to accessible positions
+  const accessibleMatchingCount = Math.min(3, accessiblePositions.length);
+  for (let i = 0; i < accessibleMatchingCount; i++) {
+    if (accessiblePositions.length === 0) break;
+    
+    const posIndex = Math.floor(Math.random() * accessiblePositions.length);
+    const position = accessiblePositions[posIndex];
+    accessiblePositions.splice(posIndex, 1);
+    
+    let value, tries = 0;
+    do {
+      value = Math.floor(Math.random() * 99) + 1;
+      tries++;
+      if (tries > 30) break;
+    } while (!rule(value) || hasDuplicateNeighbor(position, value, numbers, gridSize));
+    
+    numbers.push({ position, value });
+  }
+
+  // Fill the rest of the grid with non-rule-matching numbers
   for (let y = 0; y < gridSize; y++) {
     for (let x = 0; x < gridSize; x++) {
       const position = { x, y };
@@ -159,13 +190,13 @@ export const generateEasyMaze = (
       
       let value, tries = 0;
       do {
+        // Prioritize numbers NOT matching the rule for rest of the cells
         value = Math.floor(Math.random() * 99) + 1;
         tries++;
         if (tries > 30) break;
       } while (
-        numbers.some(n => n.value === value && 
-          (Math.abs(n.position.x - position.x) <= 1 && 
-           Math.abs(n.position.y - position.y) <= 1))
+        rule(value) || // Avoid rule-matching numbers for regular cells
+        hasDuplicateNeighbor(position, value, numbers, gridSize) // Avoid duplicate neighbors
       );
       
       numbers.push({ position, value });

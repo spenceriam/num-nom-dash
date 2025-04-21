@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
@@ -11,9 +11,26 @@ import GameOverScreen from "@/components/game/GameOverScreen";
 type GameState = "start" | "playing" | "gameOver";
 
 const Index = () => {
-  const [gameState, setGameState] = useState<GameState>("start");
-  const [score, setScore] = useState(0);
-  const [level, setLevel] = useState(1);
+  const [gameState, setGameState] = useState<GameState>(() => {
+    // Try to restore game state from session storage
+    const savedState = sessionStorage.getItem("gameState");
+    return savedState ? JSON.parse(savedState) : "start";
+  });
+  const [score, setScore] = useState(() => {
+    const savedScore = sessionStorage.getItem("gameScore");
+    return savedScore ? parseInt(savedScore, 10) : 0;
+  });
+  const [level, setLevel] = useState(() => {
+    const savedLevel = sessionStorage.getItem("gameLevel");
+    return savedLevel ? parseInt(savedLevel, 10) : 1;
+  });
+
+  // Save game state to session storage when it changes
+  useEffect(() => {
+    sessionStorage.setItem("gameState", JSON.stringify(gameState));
+    sessionStorage.setItem("gameScore", score.toString());
+    sessionStorage.setItem("gameLevel", level.toString());
+  }, [gameState, score, level]);
 
   const startGame = () => {
     setGameState("playing");
