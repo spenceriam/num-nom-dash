@@ -1,8 +1,9 @@
+
 import { GameRule } from "../types";
 
 type RuleDisplayProps = {
   currentRule: GameRule | null;
-  remainingNumbers: { value: number }[];
+  remainingNumbers: { value: string }[];
 };
 
 export const RuleDisplay = ({ currentRule, remainingNumbers }: RuleDisplayProps) => {

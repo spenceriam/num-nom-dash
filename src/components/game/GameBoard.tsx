@@ -1,3 +1,4 @@
+
 import { Position, GameRule } from "./types";
 import { isPositionEqual } from "./utils";
 import { Bug, Sparkles } from "lucide-react";
@@ -6,7 +7,7 @@ type GameBoardProps = {
   playerPosition: Position;
   glitchPositions: Position[];
   walls: Position[];
-  numbers: { position: Position; value: number }[];
+  numbers: { position: Position; value: string }[];
   onCellClick?: (position: Position) => void;
   currentRule: GameRule | null;
 };
