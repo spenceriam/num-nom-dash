@@ -1,3 +1,4 @@
+
 import { Position } from "./types";
 
 export const isPositionEqual = (pos1: Position, pos2: Position): boolean => {
@@ -174,6 +175,9 @@ export const generateEasyMaze = (
   // Randomly place glitch in a different position
   const glitchPos = getRandomPosition(gridSize, [playerStart]);
   const glitches = [glitchPos];
+  
+  // Initialize the numbers array
+  const numbers: { position: Position; value: string }[] = [];
   
   // Create a list of all grid positions except player and glitch positions
   const allPositions: Position[] = [];
