@@ -81,6 +81,10 @@ const Game = ({ onGameOver, level: initialLevel }: GameProps) => {
     };
   }, [level]);
 
+  // Count remaining matching numbers for debugging
+  const remainingMatchingCount = currentRule ? 
+    gameStatus.remainingNumbers.filter(n => currentRule.isMatch(n.value)).length : 0;
+
   return (
     <div 
       className="game-container relative"
@@ -96,6 +100,9 @@ const Game = ({ onGameOver, level: initialLevel }: GameProps) => {
       <div className="rule-display bg-purple-100 p-2 rounded-md mb-4 text-center">
         <span className="text-purple-800 font-medium">Rule: </span>
         <span className="text-purple-900 font-bold">{currentRule?.name}</span>
+        <div className="text-xs text-purple-700 mt-1">
+          Remaining valid numbers: {remainingMatchingCount}
+        </div>
       </div>
       
       <GameBoard 
@@ -104,6 +111,7 @@ const Game = ({ onGameOver, level: initialLevel }: GameProps) => {
         walls={gameStatus.walls}
         numbers={gameStatus.remainingNumbers}
         onCellClick={movePlayerByClick}
+        currentRule={currentRule}
       />
       
       <AlertDialog open={showLevelComplete} onOpenChange={setShowLevelComplete}>

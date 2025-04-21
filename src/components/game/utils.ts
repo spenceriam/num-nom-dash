@@ -1,3 +1,4 @@
+
 import { Position } from "./types";
 
 export const isPositionEqual = (pos1: Position, pos2: Position): boolean => {
@@ -17,7 +18,27 @@ function getNeighbors(pos: Position, gridSize: number) {
     .filter(p => p.x >= 0 && p.x < gridSize && p.y >= 0 && p.y < gridSize);
 }
 
-// Generates a 6x6 grid with no walls or glitches, numbers fill all cells except player position
+// Ensures rule-matching numbers are always accessible by placing them in corners or edges
+function getAccessiblePositions(gridSize: number, excludePositions: Position[]) {
+  // Corner and edge positions are considered "accessible"
+  const accessiblePositions: Position[] = [];
+  
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
+      // Corner or edge positions
+      if (x === 0 || y === 0 || x === gridSize-1 || y === gridSize-1) {
+        const position = { x, y };
+        if (!excludePositions.some(p => isPositionEqual(p, position))) {
+          accessiblePositions.push(position);
+        }
+      }
+    }
+  }
+  
+  return accessiblePositions;
+}
+
+// Generates a 6x6 grid with no walls, a player, and one glitch
 export const generateRandomMaze = (width: number, height: number) => {
   const gridSize = 6;
   const walls: Position[] = [];
@@ -61,6 +82,7 @@ export const generateRandomMaze = (width: number, height: number) => {
 };
 
 // Generate a 6x6 maze where the player's starting position is surrounded by numbers matching a rule
+// and rule-matching numbers are placed in accessible positions
 export const generateEasyMaze = (
   width: number,
   height: number,
@@ -117,6 +139,33 @@ export const generateEasyMaze = (
     }
   }
 
+  // Get accessible positions (corners and edges) for remaining rule-matching numbers
+  const excludePositions = [playerStart, glitchPos, ...numbers.map(n => n.position)];
+  const accessiblePositions = getAccessiblePositions(gridSize, excludePositions);
+  
+  // Ensure we have some rule-matching numbers in accessible positions
+  const numMatchingToAdd = Math.min(3, accessiblePositions.length);
+  for (let i = 0; i < numMatchingToAdd; i++) {
+    if (accessiblePositions.length === 0) break;
+    
+    // Take a random accessible position
+    const posIndex = Math.floor(Math.random() * accessiblePositions.length);
+    const position = accessiblePositions[posIndex];
+    accessiblePositions.splice(posIndex, 1);
+    
+    // Add a number matching the rule
+    let value, tries = 0, maxTries = 30;
+    do {
+      value = rule === rules.evenNumbers.isMatch 
+        ? Math.floor(Math.random() * 50) * 2 + 2 // Even number
+        : Math.floor(Math.random() * 50) * 2 + 1; // Odd number (default)
+      tries++;
+      if (tries > maxTries) break;
+    } while (!rule(value) || isDuplicateAdj(position, value));
+    
+    numbers.push({ position, value });
+  }
+
   // Fill rest of the grid randomly
   for (let y = 0; y < gridSize; y++) {
     for (let x = 0; x < gridSize; x++) {
@@ -149,4 +198,13 @@ export const generateEasyMaze = (
     glitches,
     playerStart
   };
+};
+
+// Reference to rules for maze generation
+const rules = {
+  evenNumbers: {
+    name: "Even Numbers",
+    description: "Collect all even numbers",
+    isMatch: (num: number) => num % 2 === 0
+  }
 };

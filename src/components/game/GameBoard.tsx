@@ -1,5 +1,5 @@
 
-import { Position } from "./types";
+import { Position, GameRule } from "./types";
 import { isPositionEqual } from "./utils";
 
 type GameBoardProps = {
@@ -8,6 +8,7 @@ type GameBoardProps = {
   walls: Position[];
   numbers: { position: Position; value: number }[];
   onCellClick?: (position: Position) => void;
+  currentRule: GameRule | null;
 };
 
 const isAdjacent = (player: Position, cell: Position) => {
@@ -17,7 +18,14 @@ const isAdjacent = (player: Position, cell: Position) => {
   return (dx <= 1 && dy <= 1) && !(dx === 0 && dy === 0);
 };
 
-export const GameBoard = ({ playerPosition, glitchPositions, walls, numbers, onCellClick }: GameBoardProps) => {
+export const GameBoard = ({ 
+  playerPosition, 
+  glitchPositions, 
+  walls, 
+  numbers, 
+  onCellClick, 
+  currentRule 
+}: GameBoardProps) => {
   const boardSize = 6; // 6x6 grid
   const rows = [];
   
@@ -52,8 +60,13 @@ export const GameBoard = ({ playerPosition, glitchPositions, walls, numbers, onC
           </div>
         );
       } else if (number) {
+        // Highlight valid numbers that match the current rule
+        const isValid = currentRule && currentRule.isMatch(number.value);
+        cellClass += isValid ? " bg-green-50" : "";
         cellContent = (
-          <span className="text-purple-900 font-bold text-lg">{number.value}</span>
+          <span className={`${isValid ? "text-green-700" : "text-purple-900"} font-bold text-lg`}>
+            {number.value}
+          </span>
         );
       } else {
         // Empty cell - light background so it's clear it's empty
