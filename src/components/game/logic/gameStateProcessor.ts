@@ -45,8 +45,8 @@ export function processMovement({
       lives -= 1;
       toast.error(`Wrong number! Rule: ${currentRule?.name || 'No rule'}`);
       updatedNumbers.splice(collectedNumberIndex, 1);
-      playerPosition = prev.playerStart || { x: 0, y: 0 };
-
+      // Removed the line that sent player back to start
+      
       if (lives <= 0) {
         onGameOver(score);
         return prev;
