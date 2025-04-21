@@ -1,3 +1,4 @@
+
 import { Position } from "./types";
 import { isPositionEqual } from "./utils";
 
@@ -18,9 +19,10 @@ const isAdjacent = (player: Position, cell: Position) => {
 
 export const GameBoard = ({ playerPosition, glitchPositions, walls, numbers, onCellClick }: GameBoardProps) => {
   const boardSize = 6; // 6x6 grid
-  const cells = [];
+  const rows = [];
   
   for (let y = 0; y < boardSize; y++) {
+    const cells = [];
     for (let x = 0; x < boardSize; x++) {
       const position = { x, y };
       const isWall = walls.some(wall => isPositionEqual(wall, position));
@@ -74,7 +76,7 @@ export const GameBoard = ({ playerPosition, glitchPositions, walls, numbers, onC
         <div 
           key={`${x}-${y}`}
           className={cellClass}
-          style={{ width: '100%', paddingBottom: '100%', position: 'relative' }}
+          style={{ width: '16.666%', aspectRatio: '1/1' }}
           onClick={isClickable ? () => onCellClick(position) : undefined}
           tabIndex={isClickable ? 0 : -1}
           aria-label={isClickable ? `Move to ${number ? number.value : ''}` : undefined}
@@ -86,14 +88,19 @@ export const GameBoard = ({ playerPosition, glitchPositions, walls, numbers, onC
         </div>
       );
     }
+    rows.push(
+      <div key={`row-${y}`} className="flex w-full">
+        {cells}
+      </div>
+    );
   }
   
   return (
     <div 
-      className="grid grid-cols-6 gap-1 bg-purple-100 p-1 rounded-lg shadow-inner"
+      className="grid gap-1 bg-purple-100 p-1 rounded-lg shadow-inner"
       style={{ aspectRatio: '1/1' }}
     >
-      {cells}
+      {rows}
     </div>
   );
 };

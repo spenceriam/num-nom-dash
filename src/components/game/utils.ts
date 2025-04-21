@@ -1,8 +1,7 @@
-
 import { Position } from "./types";
 
 export const isPositionEqual = (pos1: Position, pos2: Position): boolean => {
-  return pos1.x === pos1.x && pos1.y === pos2.y;
+  return pos1.x === pos2.x && pos1.y === pos2.y;
 };
 
 // Helper: Get all neighbors for a position (including diagonals)
@@ -125,4 +124,3 @@ export const generateEasyMaze = (
     playerStart
   };
 };
-
