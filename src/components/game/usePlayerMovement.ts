@@ -1,3 +1,4 @@
+
 import { useCallback } from "react";
 import { isPositionEqual } from "./utils";
 import { Direction, Position, GameStatus, GameRule } from "./types";
@@ -24,7 +25,7 @@ export const usePlayerMovement = ({
   const isMobile = useIsMobile();
 
   // Keyboard controls
-  useKeyboardMovement({ setGameStatus, gameStatus, currentRule, onGameOver });
+  useKeyboardMovement({ setGameStatus, gameStatus, currentRule, onGameOver, onLevelComplete });
 
   // Touch controls
   const { handleTouchStart, handleTouchEnd } = useTouchMovement({
@@ -32,7 +33,21 @@ export const usePlayerMovement = ({
     gameStatus,
     currentRule,
     onGameOver,
+    onLevelComplete,
   });
+
+  // Check if level is complete after each render
+  const checkLevelCompletion = useCallback(() => {
+    if (!currentRule) return;
+    
+    const remainingCorrectNumbers = gameStatus.remainingNumbers.filter(num => 
+      currentRule.isMatch(num.value)
+    );
+    
+    if (remainingCorrectNumbers.length === 0 && gameStatus.remainingNumbers.length > 0) {
+      onLevelComplete?.();
+    }
+  }, [gameStatus.remainingNumbers, currentRule, onLevelComplete]);
 
   // Adjacent movement by clicking
   const movePlayerByClick = useCallback(
@@ -47,16 +62,31 @@ export const usePlayerMovement = ({
           isPositionEqual(g, pos)
         );
         if (!isAdjacent || isWall || isGlitch) return prev;
-        return movementLogic({ prev, newPos: pos, currentRule, onGameOver });
+        
+        const newState = movementLogic({ 
+          prev, 
+          newPos: pos, 
+          currentRule, 
+          onGameOver,
+          onLevelComplete
+        });
+        
+        return newState;
       });
     },
-    [setGameStatus, currentRule, onGameOver]
+    [setGameStatus, currentRule, onGameOver, onLevelComplete]
   );
 
   const handleMove = useCallback(
     (newPos: Position) => {
       setGameStatus((prev) =>
-        movementLogic({ prev, newPos, currentRule, onGameOver, onLevelComplete })
+        movementLogic({ 
+          prev, 
+          newPos, 
+          currentRule, 
+          onGameOver, 
+          onLevelComplete 
+        })
       );
     },
     [setGameStatus, currentRule, onGameOver, onLevelComplete]
@@ -67,5 +97,6 @@ export const usePlayerMovement = ({
     handleTouchEnd,
     movePlayerByClick,
     handleMove,
+    checkLevelCompletion,
   };
 };

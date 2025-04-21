@@ -1,3 +1,4 @@
+
 import { isPositionEqual } from "./utils";
 import { GameStatus, Position, GameRule } from "./types";
 import { toast } from "sonner";
@@ -58,14 +59,13 @@ export function movementLogic({
     }
   }
 
+  // Check if there are any matching numbers left
   const remainingCorrectNumbers = updatedNumbers.filter((num) =>
     currentRule?.isMatch(num.value)
   );
 
-  if (
-    remainingCorrectNumbers.length === 0 &&
-    updatedNumbers.length !== prev.remainingNumbers.length
-  ) {
+  if (remainingCorrectNumbers.length === 0 && currentRule) {
+    // Call onLevelComplete if there are no more matching numbers
     onLevelComplete?.();
   }
 
