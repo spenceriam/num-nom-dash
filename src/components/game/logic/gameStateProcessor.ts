@@ -45,7 +45,6 @@ export function processMovement({
       lives -= 1;
       toast.error(`Wrong number! Rule: ${currentRule?.name || 'No rule'}`);
       updatedNumbers.splice(collectedNumberIndex, 1);
-      // Removed the line that sent player back to start
       
       if (lives <= 0) {
         onGameOver(score);
@@ -97,20 +96,23 @@ export function processMovement({
     onLevelComplete?.();
   }
 
-  // Handle glitch collision
+  // Only deduct a life if there's 1 or fewer matching numbers remaining
   if (updatedGlitchPositions.some((g) => isPositionEqual(g, newPos))) {
-    lives = prev.lives - 1;
-    if (lives <= 0) {
-      onGameOver(score);
-      return prev;
-    } else {
-      toast.error(`Hit by a glitch! 1 life lost - ${lives} remaining`);
-      return {
-        ...prev,
-        lives,
-        playerPosition: prev.playerStart || { x: 0, y: 0 },
-        glitchPositions: updatedGlitchPositions
-      };
+    // Check if there are 1 or fewer matching numbers
+    if (remainingCorrectNumbers.length <= 1) {
+      lives = prev.lives - 1;
+      if (lives <= 0) {
+        onGameOver(score);
+        return prev;
+      } else {
+        toast.error(`Hit by a glitch! 1 life lost - ${lives} remaining`);
+        return {
+          ...prev,
+          lives,
+          playerPosition: prev.playerStart || { x: 0, y: 0 },
+          glitchPositions: updatedGlitchPositions
+        };
+      }
     }
   }
 
