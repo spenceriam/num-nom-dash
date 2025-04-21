@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,6 +5,7 @@ import { Link } from "react-router-dom";
 import Game from "@/components/game/Game";
 import StartScreen from "@/components/game/StartScreen";
 import GameOverScreen from "@/components/game/GameOverScreen";
+import { RulesDialog } from "@/components/game/RulesDialog";
 
 // Game states
 type GameState = "start" | "playing" | "gameOver";
@@ -52,6 +52,9 @@ const Index = () => {
       <Card className="w-full max-w-md shadow-lg border-2 border-purple-200 mb-4">
         <CardContent className="p-0">
           <div className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-4 rounded-t-lg flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <RulesDialog />
+            </div>
             <h1 className="text-2xl font-bold text-center flex-1">Num Dash</h1>
             <Link to="/high-scores">
               <Button variant="secondary" size="sm">
