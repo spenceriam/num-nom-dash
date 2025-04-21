@@ -35,8 +35,8 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-purple-50 to-blue-100 p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#012A4A] via-[#013A63] to-[#014F86] animate-gradient bg-[length:200%_200%]">
+      <div className="w-full max-w-md p-4">
         {gameState === "playing" && (
           <Game 
             onGameOver={endGame} 
