@@ -8,6 +8,7 @@ type LevelCompleteDialogProps = {
   onComplete: () => void;
   level: number;
   maxLevel: number;
+  onStartNext?: () => void;
 };
 
 export const LevelCompleteDialog = ({ 
@@ -15,9 +16,17 @@ export const LevelCompleteDialog = ({
   onOpenChange, 
   onComplete, 
   level, 
-  maxLevel 
+  maxLevel,
+  onStartNext
 }: LevelCompleteDialogProps) => {
   const nextLevel = levels.find(l => l.id === level + 1);
+  
+  const handleComplete = () => {
+    onComplete();
+    if (level < maxLevel && onStartNext) {
+      onStartNext();
+    }
+  };
 
   return (
     <AlertDialog open={show} onOpenChange={onOpenChange}>
@@ -38,7 +47,7 @@ export const LevelCompleteDialog = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogAction onClick={onComplete}>
+          <AlertDialogAction onClick={handleComplete}>
             {level >= maxLevel ? "See Final Score" : "Start Next Level"}
           </AlertDialogAction>
         </AlertDialogFooter>

@@ -55,12 +55,17 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
     handleTouchStart,
     handleTouchEnd,
     movePlayerByClick,
+    startGlitchMovement,
+    stopGlitchMovement,
   } = usePlayerMovement({
     gameStatus,
     setGameStatus,
     currentRule,
     onGameOver,
-    onLevelComplete: () => setShowLevelComplete(true),
+    onLevelComplete: () => {
+      stopGlitchMovement();
+      setShowLevelComplete(true);
+    },
   });
 
   useEffect(() => {
@@ -156,6 +161,7 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
         onComplete={handleLevelComplete}
         level={level}
         maxLevel={levels.length}
+        onStartNext={startGlitchMovement}
       />
     </div>
   );

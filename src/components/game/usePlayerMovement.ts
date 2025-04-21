@@ -166,7 +166,7 @@ export const usePlayerMovement = ({
     if (remainingCorrectNumbers.length === 0 && gameStatus.remainingNumbers.length > 0) {
       wrappedLevelComplete();
     }
-  }, [gameStatus.remainingNumbers, currentRule, onLevelComplete]);
+  }, [gameStatus.remainingNumbers, currentRule, wrappedLevelComplete]);
 
   const movePlayerByClick = useCallback(
     (pos: Position) => {
@@ -203,5 +203,7 @@ export const usePlayerMovement = ({
     movePlayerByClick,
     handleMove,
     checkLevelCompletion,
+    startGlitchMovement,
+    stopGlitchMovement,
   };
 };
