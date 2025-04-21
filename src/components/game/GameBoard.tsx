@@ -60,11 +60,9 @@ export const GameBoard = ({
           </div>
         );
       } else if (number) {
-        // Highlight valid numbers that match the current rule
-        const isValid = currentRule && currentRule.isMatch(number.value);
-        cellClass += isValid ? " bg-green-50" : "";
+        // Removed highlighting logic
         cellContent = (
-          <span className={`${isValid ? "text-green-700" : "text-purple-900"} font-bold text-lg`}>
+          <span className="text-purple-900 font-bold text-lg">
             {number.value}
           </span>
         );
