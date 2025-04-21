@@ -1,4 +1,3 @@
-
 import { isPositionEqual } from "./utils";
 import { GameStatus, Position, GameRule } from "./types";
 import { toast } from "sonner";
@@ -8,6 +7,7 @@ type MovementLogicParams = {
   newPos: Position;
   currentRule: GameRule | null;
   onGameOver: (score: number) => void;
+  onLevelComplete?: () => void;
 };
 
 export function movementLogic({
@@ -15,6 +15,7 @@ export function movementLogic({
   newPos,
   currentRule,
   onGameOver,
+  onLevelComplete,
 }: MovementLogicParams): GameStatus {
   if (prev.walls.some((wall) => isPositionEqual(wall, newPos))) {
     return prev;
@@ -23,7 +24,7 @@ export function movementLogic({
   let updatedNumbers = [...prev.remainingNumbers];
   let score = prev.score;
   let lives = prev.lives;
-  let playerPosition = newPos; 
+  let playerPosition = newPos;
 
   const collectedNumberIndex = updatedNumbers.findIndex((num) =>
     isPositionEqual(num.position, newPos)
@@ -32,13 +33,11 @@ export function movementLogic({
   if (collectedNumberIndex !== -1) {
     const collectedNumber = updatedNumbers[collectedNumberIndex];
 
-    // Strictly check the current rule before awarding points
     if (currentRule && currentRule.isMatch(collectedNumber.value)) {
       score += 10;
       updatedNumbers.splice(collectedNumberIndex, 1);
       toast.success(`+10 points!`);
     } else {
-      // Wrong number: lose a life, reset position to start, and remove the number
       lives -= 1;
       toast.error(`Wrong number! Rule: ${currentRule?.name || 'No rule'}`);
 
@@ -67,7 +66,7 @@ export function movementLogic({
     remainingCorrectNumbers.length === 0 &&
     updatedNumbers.length !== prev.remainingNumbers.length
   ) {
-    toast.success("Level complete!");
+    onLevelComplete?.();
   }
 
   if (prev.glitchPositions.some((g) => isPositionEqual(g, newPos))) {

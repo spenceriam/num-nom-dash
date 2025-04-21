@@ -1,4 +1,3 @@
-
 import { useCallback } from "react";
 import { isPositionEqual } from "./utils";
 import { Direction, Position, GameStatus, GameRule } from "./types";
@@ -12,6 +11,7 @@ export type UsePlayerMovementProps = {
   setGameStatus: React.Dispatch<React.SetStateAction<GameStatus>>;
   currentRule: GameRule | null;
   onGameOver: (score: number) => void;
+  onLevelComplete?: () => void;
 };
 
 export const usePlayerMovement = ({
@@ -19,6 +19,7 @@ export const usePlayerMovement = ({
   setGameStatus,
   currentRule,
   onGameOver,
+  onLevelComplete,
 }: UsePlayerMovementProps) => {
   const isMobile = useIsMobile();
 
@@ -52,9 +53,19 @@ export const usePlayerMovement = ({
     [setGameStatus, currentRule, onGameOver]
   );
 
+  const handleMove = useCallback(
+    (newPos: Position) => {
+      setGameStatus((prev) =>
+        movementLogic({ prev, newPos, currentRule, onGameOver, onLevelComplete })
+      );
+    },
+    [setGameStatus, currentRule, onGameOver, onLevelComplete]
+  );
+
   return {
     handleTouchStart,
     handleTouchEnd,
     movePlayerByClick,
+    handleMove,
   };
 };

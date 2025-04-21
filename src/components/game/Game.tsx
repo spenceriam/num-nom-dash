@@ -7,6 +7,7 @@ import { Direction, GameStatus, Position, GameRule } from "./types";
 import { levels } from "./levels";
 import { isPositionEqual } from "./utils";
 import { usePlayerMovement } from "./usePlayerMovement";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction } from "@/components/ui/alert-dialog";
 
 type GameProps = {
   onGameOver: (score: number) => void;
@@ -15,20 +16,31 @@ type GameProps = {
 
 const INITIAL_LIVES = 3;
 
-const Game = ({ onGameOver, level }: GameProps) => {
+const Game = ({ onGameOver, level: initialLevel }: GameProps) => {
   const isMobile = useIsMobile();
+  const [level, setLevel] = useState(initialLevel);
+  const [showLevelComplete, setShowLevelComplete] = useState(false);
   const [gameStatus, setGameStatus] = useState<GameStatus>({
     score: 0,
     lives: INITIAL_LIVES,
     level,
     playerPosition: { x: 0, y: 0 },
-    playerStart: { x: 0, y: 0 }, // Initialize playerStart
+    playerStart: { x: 0, y: 0 },
     glitchPositions: [],
     remainingNumbers: [],
     walls: []
   });
   const [currentRule, setCurrentRule] = useState<GameRule | null>(null);
   const gameLoopRef = useRef<number | null>(null);
+
+  const handleLevelComplete = () => {
+    if (level >= levels.length) {
+      onGameOver(gameStatus.score);
+    } else {
+      setLevel(prev => prev + 1);
+      setShowLevelComplete(false);
+    }
+  };
 
   const {
     handleTouchStart,
@@ -39,6 +51,7 @@ const Game = ({ onGameOver, level }: GameProps) => {
     setGameStatus,
     currentRule,
     onGameOver,
+    onLevelComplete: () => setShowLevelComplete(true),
   });
 
   useEffect(() => {
@@ -47,11 +60,11 @@ const Game = ({ onGameOver, level }: GameProps) => {
     
     setCurrentRule(gameLevel.rule);
     setGameStatus({
-      score: 0,
+      score: gameStatus.score, // Keep the current score
       lives: INITIAL_LIVES,
       level,
       playerPosition: gameLevel.maze.playerStart,
-      playerStart: gameLevel.maze.playerStart, // Store the starting position
+      playerStart: gameLevel.maze.playerStart,
       glitchPositions: gameLevel.maze.glitches,
       remainingNumbers: gameLevel.maze.numbers,
       walls: gameLevel.maze.walls
@@ -70,7 +83,7 @@ const Game = ({ onGameOver, level }: GameProps) => {
 
   return (
     <div 
-      className="game-container"
+      className="game-container relative"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -92,6 +105,24 @@ const Game = ({ onGameOver, level }: GameProps) => {
         numbers={gameStatus.remainingNumbers}
         onCellClick={movePlayerByClick}
       />
+      
+      <AlertDialog open={showLevelComplete} onOpenChange={setShowLevelComplete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Level Complete!</AlertDialogTitle>
+            <AlertDialogDescription>
+              {level >= levels.length 
+                ? "Congratulations! You've completed all levels!"
+                : `Get ready for Level ${level + 1}!`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={handleLevelComplete}>
+              {level >= levels.length ? "See Final Score" : "Start Next Level"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       
       {isMobile && (
         <div className="mt-4 text-center text-sm text-gray-500">
