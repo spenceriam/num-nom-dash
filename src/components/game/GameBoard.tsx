@@ -13,7 +13,7 @@ type GameBoardProps = {
 const isAdjacent = (player: Position, cell: Position) => {
   const dx = Math.abs(player.x - cell.x);
   const dy = Math.abs(player.y - cell.y);
-  return dx + dy === 1;
+  return dx + dy === 1; // Only direct adjacent cells (up, down, left, right)
 };
 
 export const GameBoard = ({ playerPosition, glitchPositions, walls, numbers, onCellClick }: GameBoardProps) => {
@@ -62,16 +62,12 @@ export const GameBoard = ({ playerPosition, glitchPositions, walls, numbers, onC
         cellClass += " bg-purple-50";
       }
 
-      // Can only click to move into adjacent cells (if not a wall/glitch)
-      if (
-        onCellClick &&
-        !isWall &&
-        !isPlayer &&
-        !isGlitch &&
-        isAdjacent(playerPosition, position)
-      ) {
-        isClickable = true;
-        cellClass += " cursor-pointer hover:ring-2 hover:ring-green-400";
+      // Check if this cell is adjacent to the player position
+      if (onCellClick && !isWall && !isPlayer && !isGlitch) {
+        if (isAdjacent(playerPosition, position)) {
+          isClickable = true;
+          cellClass += " cursor-pointer hover:bg-green-100 hover:ring-2 hover:ring-green-400 transition-all";
+        }
       }
 
       cells.push(
@@ -81,8 +77,8 @@ export const GameBoard = ({ playerPosition, glitchPositions, walls, numbers, onC
           style={{ width: '100%', paddingBottom: '100%', position: 'relative' }}
           onClick={isClickable ? () => onCellClick(position) : undefined}
           tabIndex={isClickable ? 0 : -1}
-          aria-label={isClickable ? "Move here" : undefined}
-          role="button"
+          aria-label={isClickable ? `Move to ${number ? number.value : ''}` : undefined}
+          role={isClickable ? "button" : undefined}
         >
           <div className="absolute inset-0 flex items-center justify-center">
             {cellContent}
