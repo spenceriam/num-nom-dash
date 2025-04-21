@@ -12,7 +12,7 @@ const Index = () => {
   const [gameStatus, setGameStatus] = useState<GameStatus>({
     score: 0,
     lives: 3,
-    level: 1,
+    level: 1, // Ensure we start with level 1
     playerPosition: { x: 0, y: 0 },
     playerStart: { x: 0, y: 0 },
     glitchPositions: [],
@@ -40,7 +40,7 @@ const Index = () => {
         {gameState === "playing" && (
           <Game 
             onGameOver={endGame} 
-            level={1}
+            level={1} // Explicitly set to level 1
             onUpdateGameStatus={updateGameStatus}
           />
         )}

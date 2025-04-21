@@ -73,43 +73,42 @@ const rules = {
   }
 };
 
-// Create levels
+// Create levels with correct progression
 export const levels: GameLevel[] = [
   {
-    id: 1,
+    id: 1, // Even Numbers (Level 1)
     rule: rules.evens,
     maze: generateEasyMaze(6, 6, rules.evens.isMatch),
     glitchSpeed: 1,
   },
   {
-    id: 2,
+    id: 2, // Odd Numbers (Level 2)
     rule: rules.odds,
     maze: generateRandomMaze(8, 8),
     glitchSpeed: 1.2,
   },
   {
-    id: 3,
+    id: 3, // Factors of 9 (Level 3)
     rule: rules.factorOf9,
     maze: generateRandomMaze(8, 8),
     glitchSpeed: 1.4,
   },
   {
-    id: 4,
+    id: 4, // Equals 10 (Level 4)
     rule: rules.equalsTo10,
     maze: generateRandomMaze(10, 10),
     glitchSpeed: 1.6,
   },
   {
-    id: 5,
+    id: 5, // Equals 15 (Level 5)
     rule: rules.equalsTo15,
     maze: generateRandomMaze(10, 10),
     glitchSpeed: 1.8,
   },
   {
-    id: 6,
+    id: 6, // Multiply to 12 (Level 6)
     rule: rules.multiplyTo12,
     maze: generateRandomMaze(10, 10),
     glitchSpeed: 2,
   }
 ];
-
