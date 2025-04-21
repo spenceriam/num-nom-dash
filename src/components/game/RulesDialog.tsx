@@ -49,7 +49,6 @@ export function RulesDialog() {
             <ul className="list-disc pl-5 space-y-2 text-sm">
               <li>Glitches will cost you a life if you touch them</li>
               <li>When only one valid number remains, glitches will chase you!</li>
-              <li>Take too long, and your score will suffer - keep moving!</li>
             </ul>
           </div>
         </div>
