@@ -1,6 +1,6 @@
-
 import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { GameBoard } from "./GameBoard";
 import { Direction, GameStatus, Position, GameRule } from "./types";
@@ -10,6 +10,7 @@ import { usePlayerMovement } from "./usePlayerMovement";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { RulesDialog } from "./RulesDialog";
 
 type GameProps = {
   onGameOver: (score: number) => void;
@@ -47,7 +48,6 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
   };
   
   const handleNewGame = () => {
-    // Reset to level 1
     gameInitializedRef.current = false;
     setLevel(1);
     onGameOver(gameStatus.score);
@@ -157,26 +157,14 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
         onCellClick={movePlayerByClick}
         currentRule={currentRule}
       />
-      
-      <AlertDialog open={showLevelComplete} onOpenChange={setShowLevelComplete}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Level Complete!</AlertDialogTitle>
-            <AlertDialogDescription>
-              {level >= levels.length 
-                ? "Congratulations! You've completed all levels!"
-                : `Get ready for Level ${level + 1}!`}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={handleLevelComplete}>
-              {level >= levels.length ? "See Final Score" : "Start Next Level"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-      
-      <div className="mt-6 flex justify-center">
+
+      <div className="mt-6 flex justify-between items-center">
+        <div className="flex gap-2">
+          <RulesDialog />
+          <Link to="/high-scores">
+            <Button variant="secondary" size="sm">High Scores</Button>
+          </Link>
+        </div>
         <Button 
           onClick={handleNewGame}
           className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-2 rounded-full hover:opacity-90 transition-opacity"
@@ -194,6 +182,24 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
           Click an adjacent square or use arrow keys to move Num Nom
         </div>
       )}
+
+      <AlertDialog open={showLevelComplete} onOpenChange={setShowLevelComplete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Level Complete!</AlertDialogTitle>
+            <AlertDialogDescription>
+              {level >= levels.length 
+                ? "Congratulations! You've completed all levels!"
+                : `Get ready for Level ${level + 1}!`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={handleLevelComplete}>
+              {level >= levels.length ? "See Final Score" : "Start Next Level"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
