@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { saveScore } from "./highScores";
 import { toast } from "sonner";
+import { Home } from "lucide-react";
+import { Link } from "react-router-dom";
 
 type GameOverScreenProps = {
   score: number;
@@ -59,12 +61,22 @@ const GameOverScreen = ({ score, onRestart }: GameOverScreenProps) => {
         <p className="text-green-600 font-medium">Score submitted successfully!</p>
       )}
       
-      <Button
-        onClick={onRestart}
-        className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-2 rounded-full hover:opacity-90 transition-opacity"
-      >
-        Play Again
-      </Button>
+      <div className="flex space-x-2">
+        <Button
+          onClick={onRestart}
+          className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-2 rounded-full hover:opacity-90 transition-opacity"
+        >
+          Play Again
+        </Button>
+        <Link to="/">
+          <Button
+            variant="secondary"
+            className="px-8 py-2"
+          >
+            <Home className="mr-2" /> Home
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 };
