@@ -1,4 +1,3 @@
-
 import { isPositionEqual } from "./utils";
 import { GameStatus, Position, GameRule } from "./types";
 import { toast } from "sonner";
@@ -26,6 +25,17 @@ export function movementLogic({
   let score = prev.score;
   let lives = prev.lives;
   let playerPosition = newPos;
+
+  // Check if any glitch is on a number and remove that number
+  prev.glitchPositions.forEach(glitch => {
+    const numberIndex = updatedNumbers.findIndex(num => 
+      isPositionEqual(num.position, glitch)
+    );
+    if (numberIndex !== -1) {
+      updatedNumbers.splice(numberIndex, 1);
+      toast.error("A glitch consumed a number!");
+    }
+  });
 
   const collectedNumberIndex = updatedNumbers.findIndex((num) =>
     isPositionEqual(num.position, newPos)
@@ -65,10 +75,10 @@ export function movementLogic({
   );
 
   if (remainingCorrectNumbers.length === 0 && currentRule) {
-    // Call onLevelComplete if there are no more matching numbers
     onLevelComplete?.();
   }
 
+  // Handle glitch collision
   if (prev.glitchPositions.some((g) => isPositionEqual(g, newPos))) {
     lives = prev.lives - 1;
     if (lives <= 0) {
@@ -79,7 +89,7 @@ export function movementLogic({
       return {
         ...prev,
         lives,
-        playerPosition: prev.playerPosition,
+        playerPosition: prev.playerStart || { x: 0, y: 0 },
       };
     }
   }

@@ -21,17 +21,27 @@ function getNeighbors(pos: Position, gridSize: number) {
 export const generateRandomMaze = (width: number, height: number) => {
   const gridSize = 6;
   const walls: Position[] = [];
-  const glitches: Position[] = [];
-
+  
   // Place player at bottom-right corner by default for now
   const playerStart = { x: 5, y: 5 };
 
-  // Fill all cells (except player position) with numbers
+  // Add one glitch in a random position that's not the player start
+  let glitchPos: Position;
+  do {
+    glitchPos = {
+      x: Math.floor(Math.random() * gridSize),
+      y: Math.floor(Math.random() * gridSize)
+    };
+  } while (isPositionEqual(glitchPos, playerStart));
+
+  const glitches = [glitchPos];
+
+  // Fill all cells (except player position and glitch) with numbers
   const numbers: { position: Position; value: number }[] = [];
   for (let y = 0; y < gridSize; y++) {
     for (let x = 0; x < gridSize; x++) {
       const position = { x, y };
-      if (!isPositionEqual(position, playerStart)) {
+      if (!isPositionEqual(position, playerStart) && !isPositionEqual(position, glitchPos)) {
         numbers.push({
           position,
           value: Math.floor(Math.random() * 99) + 1
@@ -58,10 +68,23 @@ export const generateEasyMaze = (
 ) => {
   const gridSize = 6;
   const walls: Position[] = [];
-  const glitches: Position[] = [];
-
-  // Player always starts near the center (to maximize adjacent moves)
+  
+  // Player starts near the center
   const playerStart = { x: 2, y: 2 };
+
+  // Add one glitch in a random position that's not near the player
+  let glitchPos: Position;
+  do {
+    glitchPos = {
+      x: Math.floor(Math.random() * gridSize),
+      y: Math.floor(Math.random() * gridSize)
+    };
+  } while (
+    Math.abs(glitchPos.x - playerStart.x) <= 1 && 
+    Math.abs(glitchPos.y - playerStart.y) <= 1
+  );
+
+  const glitches = [glitchPos];
   const numbers: { position: Position; value: number }[] = [];
   const adjacentOffsets = [
     { dx: -1, dy: -1 }, { dx: 0, dy: -1 }, { dx: 1, dy: -1 },
@@ -77,27 +100,30 @@ export const generateEasyMaze = (
     });
   }
 
-  // Place required numbers that match the rule in all adjacent cells, avoiding duplicate neighbors
+  // Place required numbers that match the rule in all adjacent cells
   for (const { dx, dy } of adjacentOffsets) {
     const x = playerStart.x + dx;
     const y = playerStart.y + dy;
     if (x >= 0 && x < gridSize && y >= 0 && y < gridSize) {
-      let value, tries = 0, maxTries = 30;
-      do {
-        value = Math.floor(Math.random() * 50) * 2 + 2; // even from 2 to 100
-        tries++;
-        if (tries > maxTries) break; // fallback if it's very constrained
-      } while ((!rule(value) || isDuplicateAdj({ x, y }, value)));
-      numbers.push({ position: { x, y }, value });
+      if (!isPositionEqual({ x, y }, glitchPos)) {
+        let value, tries = 0, maxTries = 30;
+        do {
+          value = Math.floor(Math.random() * 50) * 2 + 2;
+          tries++;
+          if (tries > maxTries) break;
+        } while ((!rule(value) || isDuplicateAdj({ x, y }, value)));
+        numbers.push({ position: { x, y }, value });
+      }
     }
   }
 
-  // Fill rest of the grid randomly, avoiding duplicate neighbors
+  // Fill rest of the grid randomly
   for (let y = 0; y < gridSize; y++) {
     for (let x = 0; x < gridSize; x++) {
       const position = { x, y };
       if (
         isPositionEqual(position, playerStart) ||
+        isPositionEqual(position, glitchPos) ||
         numbers.some(n => isPositionEqual(n.position, position))
       ) {
         continue;
