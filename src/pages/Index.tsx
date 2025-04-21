@@ -88,26 +88,11 @@ const Index = () => {
           
           <div className="p-4">
             {gameState === "playing" && (
-              <div>
-                <div className="flex justify-between items-center mb-4">
-                  <div className="text-purple-900 font-semibold">Level: {level}</div>
-                  <div className="text-purple-900 font-semibold flex items-center gap-1">
-                    {Array.from({ length: gameStatus.lives }).map((_, i) => (
-                      <Sparkles 
-                        key={i}
-                        className="w-5 h-5 text-green-700" 
-                        strokeWidth={2.5}
-                      />
-                    ))}
-                  </div>
-                  <div className="text-purple-900 font-semibold">Score: {score}</div>
-                </div>
-                <Game 
-                  onGameOver={endGame} 
-                  level={level}
-                  onUpdateGameStatus={updateGameStatus}
-                />
-              </div>
+              <Game 
+                onGameOver={endGame} 
+                level={level}
+                onUpdateGameStatus={updateGameStatus}
+              />
             )}
             {gameState === "start" && <StartScreen onStart={startGame} />}
             {gameState === "gameOver" && <GameOverScreen score={score} onRestart={restartGame} />}
