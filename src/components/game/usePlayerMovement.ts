@@ -44,6 +44,8 @@ export const usePlayerMovement = ({
 
       let updatedNumbers = [...prev.remainingNumbers];
       let score = prev.score;
+      let lives = prev.lives;
+      let playerPosition = newPos; // Assume successful move unless wrong number or glitch
 
       const collectedNumberIndex = updatedNumbers.findIndex((num) =>
         isPositionEqual(num.position, newPos)
@@ -57,7 +59,24 @@ export const usePlayerMovement = ({
           updatedNumbers.splice(collectedNumberIndex, 1);
           toast.success(`+10 points!`);
         } else {
-          toast.error("Wrong number!");
+          // Wrong number: lose a life, reset position to start.
+          lives -= 1;
+          toast.error("Wrong number! Lost a life and reset.");
+          playerPosition = { x: 0, y: 0 }; // Reset to top-left by default
+          // Try to use the original player start, fallback to {0,0}
+          if ((prev as any).playerStart) {
+            playerPosition = (prev as any).playerStart;
+          }
+          // Don't allow negative lives and handle game over
+          if (lives <= 0) {
+            onGameOver(score);
+            return prev;
+          }
+          return {
+            ...prev,
+            lives,
+            playerPosition,
+          };
         }
       }
 
@@ -73,8 +92,7 @@ export const usePlayerMovement = ({
       }
 
       if (prev.glitchPositions.some((g) => isPositionEqual(g, newPos))) {
-        const lives = prev.lives - 1;
-
+        lives = prev.lives - 1;
         if (lives <= 0) {
           onGameOver(score);
           return prev;
@@ -90,8 +108,9 @@ export const usePlayerMovement = ({
 
       return {
         ...prev,
-        playerPosition: newPos,
+        playerPosition,
         score,
+        lives,
         remainingNumbers: updatedNumbers,
       };
     },
