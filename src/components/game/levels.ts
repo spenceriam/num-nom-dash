@@ -4,12 +4,35 @@ import { generateRandomMaze, generateEasyMaze } from "./utils";
 
 // Define game rules
 const rules = {
-  equalsTo5: {
-    name: "Equals 5",
-    description: "Collect all expressions that equal 5",
+  evens: {
+    name: "Even Numbers",
+    description: "Collect all expressions that equal even numbers",
     isMatch: (expression: string) => {
       try {
-        return eval(expression) === 5;
+        return eval(expression) % 2 === 0;
+      } catch {
+        return false;
+      }
+    }
+  },
+  odds: {
+    name: "Odd Numbers",
+    description: "Collect all expressions that equal odd numbers",
+    isMatch: (expression: string) => {
+      try {
+        return eval(expression) % 2 === 1;
+      } catch {
+        return false;
+      }
+    }
+  },
+  factorOf9: {
+    name: "Factors of 9",
+    description: "Collect all expressions that are factors of 9",
+    isMatch: (expression: string) => {
+      try {
+        const result = eval(expression);
+        return result > 0 && 9 % result === 0;
       } catch {
         return false;
       }
@@ -37,35 +60,12 @@ const rules = {
       }
     }
   },
-  equalsTo20: {
-    name: "Equals 20",
-    description: "Collect all expressions that equal 20",
-    isMatch: (expression: string) => {
-      try {
-        return eval(expression) === 20;
-      } catch {
-        return false;
-      }
-    }
-  },
   multiplyTo12: {
     name: "Multiply to 12",
     description: "Collect all expressions that multiply to 12",
     isMatch: (expression: string) => {
       try {
         return eval(expression) === 12 && expression.includes('*');
-      } catch {
-        return false;
-      }
-    }
-  },
-  divideToWhole: {
-    name: "Whole Division",
-    description: "Collect all divisions that give whole numbers",
-    isMatch: (expression: string) => {
-      try {
-        const result = eval(expression);
-        return expression.includes('/') && Number.isInteger(result);
       } catch {
         return false;
       }
@@ -77,38 +77,39 @@ const rules = {
 export const levels: GameLevel[] = [
   {
     id: 1,
-    rule: rules.equalsTo5,
-    maze: generateEasyMaze(6, 6, rules.equalsTo5.isMatch),
+    rule: rules.evens,
+    maze: generateEasyMaze(6, 6, rules.evens.isMatch),
     glitchSpeed: 1,
   },
   {
     id: 2,
-    rule: rules.equalsTo10,
-    maze: generateRandomMaze(10, 10),
+    rule: rules.odds,
+    maze: generateRandomMaze(8, 8),
     glitchSpeed: 1.2,
   },
   {
     id: 3,
-    rule: rules.equalsTo15,
-    maze: generateRandomMaze(10, 10),
+    rule: rules.factorOf9,
+    maze: generateRandomMaze(8, 8),
     glitchSpeed: 1.4,
   },
   {
     id: 4,
-    rule: rules.equalsTo20,
+    rule: rules.equalsTo10,
     maze: generateRandomMaze(10, 10),
     glitchSpeed: 1.6,
   },
   {
     id: 5,
-    rule: rules.multiplyTo12,
+    rule: rules.equalsTo15,
     maze: generateRandomMaze(10, 10),
     glitchSpeed: 1.8,
   },
   {
     id: 6,
-    rule: rules.divideToWhole,
+    rule: rules.multiplyTo12,
     maze: generateRandomMaze(10, 10),
     glitchSpeed: 2,
   }
 ];
+
