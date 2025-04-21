@@ -72,7 +72,7 @@ export const usePlayerMovement = ({
   }, [setGameStatus]);
 
   useEffect(() => {
-    glitchIntervalRef.current = window.setInterval(moveGlitches, 1200);
+    glitchIntervalRef.current = window.setInterval(moveGlitches, 1560);
     
     return () => {
       if (glitchIntervalRef.current) {
