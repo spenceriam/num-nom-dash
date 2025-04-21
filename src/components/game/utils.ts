@@ -8,130 +8,69 @@ export const isPositionEqual = (pos1: Position, pos2: Position): boolean => {
 export const generateRandomMaze = (width: number, height: number) => {
   // Create more consistent maze with proper placement
   const gridSize = 6; // Use 6x6 grid size
-  const walls: Position[] = [];
   
-  // Add some walls (approximately 15% of the board)
-  const wallCount = Math.floor(gridSize * gridSize * 0.15);
-  for (let i = 0; i < wallCount; i++) {
-    walls.push({
-      x: Math.floor(Math.random() * gridSize),
-      y: Math.floor(Math.random() * gridSize)
-    });
-  }
-  
-  // Generate numbers (approximately 50% of the remaining cells)
-  const numbers: { position: Position; value: number }[] = [];
-  const cellCount = Math.floor((gridSize * gridSize - walls.length) * 0.5);
-  
-  // Make sure we generate at least 10 numbers
-  const minNumberCount = Math.min(10, gridSize * gridSize - walls.length - 4); // -4 to leave room for player and glitches
-  const targetNumberCount = Math.max(cellCount, minNumberCount);
-  
-  for (let i = 0; i < targetNumberCount; i++) {
-    let position: Position;
-    let attempts = 0;
-    do {
-      position = {
-        x: Math.floor(Math.random() * gridSize),
-        y: Math.floor(Math.random() * gridSize)
-      };
-      attempts++;
-      // Prevent infinite loop if board is too full
-      if (attempts > 50) break;
-    } while (
-      walls.some(wall => isPositionEqual(wall, position)) ||
-      numbers.some(num => isPositionEqual(num.position, position))
-    );
-    
-    // Skip if we couldn't find a valid position after many attempts
-    if (attempts > 50) continue;
-    
-    numbers.push({
-      position,
-      value: Math.floor(Math.random() * 100) + 1 // Random number 1-100
-    });
-  }
-  
-  // Add glitches (2-3 glitches)
-  const glitches: Position[] = [];
-  const glitchCount = Math.floor(Math.random() * 2) + 2; // 2-3 glitches
-  
-  for (let i = 0; i < glitchCount; i++) {
-    let position: Position;
-    let attempts = 0;
-    do {
-      position = {
-        x: Math.floor(Math.random() * gridSize),
-        y: Math.floor(Math.random() * gridSize)
-      };
-      attempts++;
-      if (attempts > 50) break;
-    } while (
-      walls.some(wall => isPositionEqual(wall, position)) ||
-      numbers.some(num => isPositionEqual(num.position, position)) ||
-      glitches.some(glitch => isPositionEqual(glitch, position))
-    );
-    
-    // Skip if we couldn't find a valid position
-    if (attempts > 50) continue;
-    
-    glitches.push(position);
-  }
-  
-  // Set player start position (preferably in a corner or edge)
-  const possibleStartPositions = [
-    {x: 0, y: 0}, {x: 0, y: gridSize-1}, 
-    {x: gridSize-1, y: 0}, {x: gridSize-1, y: gridSize-1}
+  // Predefined walls (similar to the image)
+  const walls: Position[] = [
+    {x: 0, y: 0}, // top-left corner
+    {x: 1, y: 3}, // middle-left area
+    {x: 4, y: 2}, // middle-right area
+    {x: 4, y: 4}, // bottom-right area
   ];
   
-  let playerStart: Position | null = null;
+  // Generate numbers for ALL remaining cells
+  const numbers: { position: Position; value: number }[] = [];
   
-  // Try corner positions first
-  for (const pos of possibleStartPositions) {
-    if (
-      !walls.some(wall => isPositionEqual(wall, pos)) &&
-      !numbers.some(num => isPositionEqual(num.position, pos)) &&
-      !glitches.some(glitch => isPositionEqual(glitch, pos))
-    ) {
-      playerStart = pos;
-      break;
+  // Fill every non-wall cell with a number
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
+      const position = {x, y};
+      
+      // Skip if this position is a wall
+      if (walls.some(wall => isPositionEqual(wall, position))) {
+        continue;
+      }
+      
+      // Add a number between 1-99
+      numbers.push({
+        position,
+        value: Math.floor(Math.random() * 99) + 1
+      });
     }
   }
   
-  // If no corner works, try any valid position
-  if (!playerStart) {
-    let attempts = 0;
-    do {
-      const pos = {
-        x: Math.floor(Math.random() * gridSize),
-        y: Math.floor(Math.random() * gridSize)
-      };
-      
-      if (
-        !walls.some(wall => isPositionEqual(wall, pos)) &&
-        !numbers.some(num => isPositionEqual(num.position, pos)) &&
-        !glitches.some(glitch => isPositionEqual(glitch, pos))
-      ) {
-        playerStart = pos;
-        break;
-      }
-      attempts++;
-    } while (attempts < 50);
+  // Add glitches (3 glitches)
+  const glitches: Position[] = [];
+  
+  // Attempt to place glitches at specific positions similar to the image
+  const targetGlitchPositions = [
+    {x: 4, y: 0}, // top-right area
+    {x: 2, y: 4}, // bottom-left area  
+    {x: 2, y: 5}, // bottom-left corner
+  ];
+  
+  for (const pos of targetGlitchPositions) {
+    // Remove any number at this position
+    const numberIndex = numbers.findIndex(num => 
+      isPositionEqual(num.position, pos)
+    );
+    
+    if (numberIndex !== -1) {
+      numbers.splice(numberIndex, 1);
+    }
+    
+    glitches.push(pos);
   }
   
-  // Final fallback - clear a random cell if we still don't have a player position
-  if (!playerStart) {
-    playerStart = { x: 0, y: 0 };
-    
-    // Remove any conflicting entities at this position
-    const wallIndex = walls.findIndex(wall => isPositionEqual(wall, playerStart));
-    if (wallIndex !== -1) walls.splice(wallIndex, 1);
-    
-    const numberIndex = numbers.findIndex(num => isPositionEqual(num.position, playerStart));
-    if (numberIndex !== -1) numbers.splice(numberIndex, 1);
-    
-    const glitchIndex = glitches.findIndex(glitch => isPositionEqual(glitch, playerStart));
-    if (glitchIndex !== -1) glitches.splice(glitchIndex, 1);
+  // Set player start position in the bottom-right, similar to the image
+  const playerStart = {x: 3, y: 5};
+  
+  // Remove any number at the player position
+  const playerNumberIndex = numbers.findIndex(num => 
+    isPositionEqual(num.position, playerStart)
+  );
+  
+  if (playerNumberIndex !== -1) {
+    numbers.splice(playerNumberIndex, 1);
   }
   
   return {
