@@ -84,13 +84,13 @@ export const levels: GameLevel[] = [
   {
     id: 2, // Odd Numbers (Level 2) - Simple numbers
     rule: rules.odds,
-    maze: generateRandomMaze(8, 8),
+    maze: generateEasyMaze(8, 8, rules.odds.isMatch, false),
     glitchSpeed: 1.2,
   },
   {
     id: 3, // Factors of 9 (Level 3) - Simple numbers
     rule: rules.factorOf9,
-    maze: generateRandomMaze(8, 8),
+    maze: generateEasyMaze(8, 8, rules.factorOf9.isMatch, false),
     glitchSpeed: 1.4,
   },
   {

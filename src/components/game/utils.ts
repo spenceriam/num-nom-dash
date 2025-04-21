@@ -1,3 +1,4 @@
+
 import { Position } from "./types";
 
 export const isPositionEqual = (pos1: Position, pos2: Position): boolean => {
@@ -119,9 +120,12 @@ export const generateRandomMaze = (width: number, height: number) => {
 
   // Fill all cells with expressions
   const numbers: { position: Position; value: string }[] = [];
+  
+  // Make sure all cells (except player and glitch) have numbers
   for (let y = 0; y < gridSize; y++) {
     for (let x = 0; x < gridSize; x++) {
       const position = { x, y };
+      // Skip player position and glitch position
       if (!isPositionEqual(position, playerStart) && !isPositionEqual(position, glitchPos)) {
         numbers.push({
           position,
@@ -154,6 +158,7 @@ export const generateEasyMaze = (
   const glitches = [glitchPos];
   const numbers: { position: Position; value: string }[] = [];
   
+  // Create a list of all grid positions except player and glitch positions
   const allPositions: Position[] = [];
   for (let y = 0; y < gridSize; y++) {
     for (let x = 0; x < gridSize; x++) {
@@ -174,8 +179,11 @@ export const generateEasyMaze = (
   const minRuleMatchingCount = 5;
   let ruleMatchingAdded = 0;
 
-  while (ruleMatchingAdded < minRuleMatchingCount && allPositions.length > 0) {
-    const position = allPositions.pop()!;
+  // Clone all positions array for tracking
+  const remainingPositions = [...allPositions];
+
+  while (ruleMatchingAdded < minRuleMatchingCount && remainingPositions.length > 0) {
+    const position = remainingPositions.pop()!;
     let value: string;
 
     if (useExpressions) {
@@ -207,8 +215,9 @@ export const generateEasyMaze = (
   }
 
   // Fill remaining positions with non-matching values
-  while (allPositions.length > 0) {
-    const position = allPositions.pop()!;
+  // This ensures all grid cells have a number
+  while (remainingPositions.length > 0) {
+    const position = remainingPositions.pop()!;
     let value: string;
 
     if (useExpressions) {
