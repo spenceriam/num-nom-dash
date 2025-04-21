@@ -1,4 +1,3 @@
-
 import { Position } from "./types";
 import { isPositionEqual } from "./utils";
 
@@ -13,7 +12,8 @@ type GameBoardProps = {
 const isAdjacent = (player: Position, cell: Position) => {
   const dx = Math.abs(player.x - cell.x);
   const dy = Math.abs(player.y - cell.y);
-  return dx + dy === 1; // Only direct adjacent cells (up, down, left, right)
+  // Chebyshev distance - allows diagonal (1 square away in any direction)
+  return (dx <= 1 && dy <= 1) && !(dx === 0 && dy === 0);
 };
 
 export const GameBoard = ({ playerPosition, glitchPositions, walls, numbers, onCellClick }: GameBoardProps) => {

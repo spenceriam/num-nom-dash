@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { isPositionEqual } from "./utils";
@@ -20,6 +19,21 @@ export const usePlayerMovement = ({
 }: UsePlayerMovementProps) => {
   const isMobile = useIsMobile();
   const touchStartRef = useRef<Position | null>(null);
+
+  // Helper: calculate all diagonal and orthogonal adjacent positions
+  const getAdjacentPositions = (pos: Position): Position[] => {
+    const offsets = [
+      [-1, -1], [0, -1], [1, -1],
+      [-1,  0],          [1,  0],
+      [-1,  1], [0,  1], [1,  1],
+    ];
+    return offsets.map(([dx, dy]) => ({
+      x: pos.x + dx,
+      y: pos.y + dy,
+    })).filter(
+      ({x, y}) => x >= 0 && x <= 5 && y >= 0 && y <= 5
+    );
+  };
 
   // MOVE LOGIC (pure, re-used for all methods)
   const moveLogic = useCallback(
@@ -84,11 +98,13 @@ export const usePlayerMovement = ({
     [currentRule, onGameOver]
   );
 
-  // KEYBOARD support (arrows)
+  // KEYBOARD support (arrows and diagonal moves with QWE/ASD/ZXC)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       let direction: Direction | null = null;
+      let diagonal: {dx: number, dy: number} | null = null;
 
+      // Support arrow keys for orthogonal movement
       switch (e.key) {
         case "ArrowUp":
           direction = "up";
@@ -102,10 +118,38 @@ export const usePlayerMovement = ({
         case "ArrowRight":
           direction = "right";
           break;
+        // Diagonal movement with QWE/ASD/ZXC keys (Q,W,E,A,S,D,Z,X,C blocks)
+        case "q":
+        case "Q":
+          diagonal = { dx: -1, dy: -1 };
+          break;
+        case "e":
+        case "E":
+          diagonal = { dx: 1, dy: -1 };
+          break;
+        case "z":
+        case "Z":
+          diagonal = { dx: -1, dy: 1 };
+          break;
+        case "c":
+        case "C":
+          diagonal = { dx: 1, dy: 1 };
+          break;
       }
 
       if (direction) {
         movePlayer(direction);
+        e.preventDefault();
+      } else if (diagonal) {
+        // Diagonal move
+        setGameStatus((prev) => {
+          const { playerPosition } = prev;
+          const newPos = {
+            x: Math.max(0, Math.min(5, playerPosition.x + diagonal!.dx)),
+            y: Math.max(0, Math.min(5, playerPosition.y + diagonal!.dy)),
+          };
+          return moveLogic(prev, newPos);
+        });
         e.preventDefault();
       }
     };
@@ -149,14 +193,14 @@ export const usePlayerMovement = ({
     touchStartRef.current = null;
   }, [isMobile]);
 
-  // CLICK-TO-MOVE on adjacent spaces
+  // CLICK-TO-MOVE on adjacent spaces (now allows diagonals)
   const movePlayerByClick = useCallback(
     (pos: Position) => {
       setGameStatus((prev) => {
         const { playerPosition, walls, glitchPositions } = prev;
         const dx = Math.abs(playerPosition.x - pos.x);
         const dy = Math.abs(playerPosition.y - pos.y);
-        const isAdjacent = dx + dy === 1;
+        const isAdjacent = (dx <= 1 && dy <= 1) && !(dx === 0 && dy === 0);
         const isWall = walls.some((wall) => isPositionEqual(wall, pos));
         const isGlitch = glitchPositions.some((g) =>
           isPositionEqual(g, pos)
