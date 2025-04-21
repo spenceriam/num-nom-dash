@@ -1,7 +1,5 @@
-
 import { useCallback } from "react";
-import { isPositionEqual } from "./utils";
-import { Direction, Position, GameStatus, GameRule } from "./types";
+import { Position, GameStatus, GameRule } from "./types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { movementLogic } from "./movementLogic";
 import { useTouchMovement } from "./useTouchMovement";
@@ -49,19 +47,16 @@ export const usePlayerMovement = ({
     }
   }, [gameStatus.remainingNumbers, currentRule, onLevelComplete]);
 
-  // Adjacent movement by clicking
+  // Allow movement to any cell by clicking
   const movePlayerByClick = useCallback(
     (pos: Position) => {
       setGameStatus((prev) => {
-        const { playerPosition, walls, glitchPositions } = prev;
-        const dx = Math.abs(playerPosition.x - pos.x);
-        const dy = Math.abs(playerPosition.y - pos.y);
-        const isAdjacent = (dx <= 1 && dy <= 1) && !(dx === 0 && dy === 0);
+        const { walls, glitchPositions } = prev;
         const isWall = walls.some((wall) => isPositionEqual(wall, pos));
         const isGlitch = glitchPositions.some((g) =>
           isPositionEqual(g, pos)
         );
-        if (!isAdjacent || isWall || isGlitch) return prev;
+        if (isWall || isGlitch) return prev;
         
         const newState = movementLogic({ 
           prev, 

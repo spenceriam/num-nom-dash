@@ -1,3 +1,4 @@
+
 import { Position, GameRule } from "./types";
 import { isPositionEqual } from "./utils";
 import { Bug, Sparkles } from "lucide-react";
@@ -9,12 +10,6 @@ type GameBoardProps = {
   numbers: { position: Position; value: number }[];
   onCellClick?: (position: Position) => void;
   currentRule: GameRule | null;
-};
-
-const isAdjacent = (player: Position, cell: Position) => {
-  const dx = Math.abs(player.x - cell.x);
-  const dy = Math.abs(player.y - cell.y);
-  return (dx <= 1 && dy <= 1) && !(dx === 0 && dy === 0);
 };
 
 export const GameBoard = ({ 
@@ -69,10 +64,8 @@ export const GameBoard = ({
       }
 
       if (onCellClick && !isWall && !isPlayer && !isGlitch) {
-        if (isAdjacent(playerPosition, position)) {
-          isClickable = true;
-          cellClass += " cursor-pointer hover:bg-[#89C2D9]/20 hover:ring-2 hover:ring-[#014F86] transition-all";
-        }
+        isClickable = true;
+        cellClass += " cursor-pointer hover:bg-[#89C2D9]/20 hover:ring-2 hover:ring-[#014F86] transition-all";
       }
 
       cells.push(
