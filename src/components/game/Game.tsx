@@ -123,10 +123,13 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
     
     setShowGlitches(false);
     
+    // Calculate glitch delay based on level (starts at 10s, reduces by 0.5s per level)
+    const glitchDelay = Math.max(10000 - ((level - 1) * 500), 5000);
+    
     const glitchTimer = setTimeout(() => {
       setShowGlitches(true);
       toast.error("Glitches have appeared!");
-    }, 10000);
+    }, glitchDelay);
     
     toast.success(`Level ${level}: ${gameLevel.rule.name}`, {
       description: gameLevel.rule.description,

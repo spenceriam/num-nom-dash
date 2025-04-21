@@ -1,4 +1,3 @@
-
 import { Position } from "./types";
 
 export const isPositionEqual = (pos1: Position, pos2: Position): boolean => {
@@ -100,6 +99,21 @@ function generateNonMatchingExpression(target: number): string {
   return generateExpressionEqualsTo(randomValue);
 }
 
+// Helper function to get random position
+function getRandomPosition(
+  gridSize: number,
+  excludePositions: Position[] = []
+): Position {
+  let position: Position;
+  do {
+    position = {
+      x: Math.floor(Math.random() * gridSize),
+      y: Math.floor(Math.random() * gridSize)
+    };
+  } while (excludePositions.some(pos => isPositionEqual(pos, position)));
+  return position;
+}
+
 export const generateRandomMaze = (width: number, height: number) => {
   const gridSize = 6;
   const walls: Position[] = [];
@@ -134,7 +148,7 @@ export const generateRandomMaze = (width: number, height: number) => {
       }
     }
   }
-
+  
   return {
     width: gridSize,
     height: gridSize,
@@ -153,10 +167,13 @@ export const generateEasyMaze = (
 ) => {
   const gridSize = 6;
   const walls: Position[] = [];
-  const playerStart = { x: 0, y: 0 };
-  const glitchPos = { x: gridSize - 1, y: gridSize - 1 };
+  
+  // Randomly place player
+  const playerStart = getRandomPosition(gridSize);
+  
+  // Randomly place glitch in a different position
+  const glitchPos = getRandomPosition(gridSize, [playerStart]);
   const glitches = [glitchPos];
-  const numbers: { position: Position; value: string }[] = [];
   
   // Create a list of all grid positions except player and glitch positions
   const allPositions: Position[] = [];
