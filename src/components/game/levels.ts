@@ -4,45 +4,71 @@ import { generateRandomMaze, generateEasyMaze } from "./utils";
 
 // Define game rules
 const rules = {
-  evenNumbers: {
-    name: "Even Numbers",
-    description: "Collect all even numbers",
-    isMatch: (num: number) => num % 2 === 0
-  },
-  oddNumbers: {
-    name: "Odd Numbers",
-    description: "Collect all odd numbers",
-    isMatch: (num: number) => num % 2 !== 0
-  },
-  multiplesOf3: {
-    name: "Multiples of 3",
-    description: "Collect all numbers that are multiples of 3",
-    isMatch: (num: number) => num % 3 === 0
-  },
-  greaterThan50: {
-    name: "Greater than 50",
-    description: "Collect all numbers greater than 50",
-    isMatch: (num: number) => num > 50
-  },
-  lessThan50: {
-    name: "Less than 50",
-    description: "Collect all numbers less than 50",
-    isMatch: (num: number) => num < 50
-  },
-  sumEquals10: {
-    name: "Sum Equals 10",
-    description: "Collect all numbers that add up to 10 (e.g., 1+9, 2+8)",
-    isMatch: (num: number) => {
-      const digits = num.toString().split('').map(Number);
-      return digits.reduce((sum, digit) => sum + digit, 0) === 10;
+  equalsTo5: {
+    name: "Equals 5",
+    description: "Collect all expressions that equal 5",
+    isMatch: (expression: string) => {
+      try {
+        return eval(expression) === 5;
+      } catch {
+        return false;
+      }
     }
   },
-  perfectSquares: {
-    name: "Perfect Squares",
-    description: "Collect all perfect square numbers",
-    isMatch: (num: number) => {
-      const sqrt = Math.sqrt(num);
-      return sqrt === Math.floor(sqrt);
+  equalsTo10: {
+    name: "Equals 10",
+    description: "Collect all expressions that equal 10",
+    isMatch: (expression: string) => {
+      try {
+        return eval(expression) === 10;
+      } catch {
+        return false;
+      }
+    }
+  },
+  equalsTo15: {
+    name: "Equals 15",
+    description: "Collect all expressions that equal 15",
+    isMatch: (expression: string) => {
+      try {
+        return eval(expression) === 15;
+      } catch {
+        return false;
+      }
+    }
+  },
+  equalsTo20: {
+    name: "Equals 20",
+    description: "Collect all expressions that equal 20",
+    isMatch: (expression: string) => {
+      try {
+        return eval(expression) === 20;
+      } catch {
+        return false;
+      }
+    }
+  },
+  multiplyTo12: {
+    name: "Multiply to 12",
+    description: "Collect all expressions that multiply to 12",
+    isMatch: (expression: string) => {
+      try {
+        return eval(expression) === 12 && expression.includes('*');
+      } catch {
+        return false;
+      }
+    }
+  },
+  divideToWhole: {
+    name: "Whole Division",
+    description: "Collect all divisions that give whole numbers",
+    isMatch: (expression: string) => {
+      try {
+        const result = eval(expression);
+        return expression.includes('/') && Number.isInteger(result);
+      } catch {
+        return false;
+      }
     }
   }
 };
@@ -51,44 +77,38 @@ const rules = {
 export const levels: GameLevel[] = [
   {
     id: 1,
-    rule: rules.evenNumbers,
-    maze: generateEasyMaze(6, 6, rules.evenNumbers.isMatch),
+    rule: rules.equalsTo5,
+    maze: generateEasyMaze(6, 6, rules.equalsTo5.isMatch),
     glitchSpeed: 1,
   },
   {
     id: 2,
-    rule: rules.oddNumbers,
+    rule: rules.equalsTo10,
     maze: generateRandomMaze(10, 10),
     glitchSpeed: 1.2,
   },
   {
     id: 3,
-    rule: rules.multiplesOf3,
+    rule: rules.equalsTo15,
     maze: generateRandomMaze(10, 10),
     glitchSpeed: 1.4,
   },
   {
     id: 4,
-    rule: rules.greaterThan50,
+    rule: rules.equalsTo20,
     maze: generateRandomMaze(10, 10),
     glitchSpeed: 1.6,
   },
   {
     id: 5,
-    rule: rules.lessThan50,
+    rule: rules.multiplyTo12,
     maze: generateRandomMaze(10, 10),
     glitchSpeed: 1.8,
   },
   {
     id: 6,
-    rule: rules.sumEquals10,
+    rule: rules.divideToWhole,
     maze: generateRandomMaze(10, 10),
     glitchSpeed: 2,
-  },
-  {
-    id: 7,
-    rule: rules.perfectSquares,
-    maze: generateRandomMaze(10, 10),
-    glitchSpeed: 2.2,
   }
 ];
