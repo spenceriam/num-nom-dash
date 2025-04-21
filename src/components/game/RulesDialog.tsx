@@ -40,16 +40,16 @@ export function RulesDialog() {
             <h4 className="font-semibold mb-2 text-purple-800">How to Win:</h4>
             <ul className="list-disc pl-5 space-y-2 text-sm">
               <li>Complete each level by collecting all numbers that match the rule</li>
-              <li>Plan your moves carefully to avoid getting stuck</li>
-              <li>Try to get the highest score possible!</li>
+              <li>Plan your moves carefully to avoid wrong numbers</li>
+              <li>Complete levels quickly for a better score - time counts!</li>
             </ul>
           </div>
           <div>
             <h4 className="font-semibold mb-2 text-purple-800">Watch Out For:</h4>
             <ul className="list-disc pl-5 space-y-2 text-sm">
               <li>Glitches will cost you a life if you touch them</li>
-              <li>Getting trapped with no valid moves will end your game</li>
-              <li>Wrong number choices can block your path to victory</li>
+              <li>When only one valid number remains, glitches will chase you!</li>
+              <li>Take too long, and your score will suffer - keep moving!</li>
             </ul>
           </div>
         </div>
