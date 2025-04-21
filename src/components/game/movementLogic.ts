@@ -11,8 +11,54 @@ type MovementLogicParams = {
   onLevelComplete?: () => void;
 };
 
-// Get all valid moves for the glitch (no walls, not on player's new position)
-function getGlitchMove(
+// Get the best move for a glitch to chase the player
+function getChaseMove(
+  glitch: Position,
+  playerPos: Position,
+  walls: Position[],
+  gridSize: number = 6
+): Position {
+  // Calculate differences
+  const dx = playerPos.x - glitch.x;
+  const dy = playerPos.y - glitch.y;
+  
+  // Prioritize moving in the direction of larger difference
+  let possibleMoves: Position[] = [];
+  
+  if (Math.abs(dx) > Math.abs(dy)) {
+    // Try horizontal movement first
+    if (dx > 0) possibleMoves.push({ x: glitch.x + 1, y: glitch.y });
+    else if (dx < 0) possibleMoves.push({ x: glitch.x - 1, y: glitch.y });
+    
+    // Then vertical
+    if (dy > 0) possibleMoves.push({ x: glitch.x, y: glitch.y + 1 });
+    else if (dy < 0) possibleMoves.push({ x: glitch.x, y: glitch.y - 1 });
+  } else {
+    // Try vertical movement first
+    if (dy > 0) possibleMoves.push({ x: glitch.x, y: glitch.y + 1 });
+    else if (dy < 0) possibleMoves.push({ x: glitch.x, y: glitch.y - 1 });
+    
+    // Then horizontal
+    if (dx > 0) possibleMoves.push({ x: glitch.x + 1, y: glitch.y });
+    else if (dx < 0) possibleMoves.push({ x: glitch.x - 1, y: glitch.y });
+  }
+  
+  // Filter valid moves
+  const validMoves = possibleMoves.filter(pos => 
+    pos.x >= 0 && pos.x < gridSize &&
+    pos.y >= 0 && pos.y < gridSize &&
+    !walls.some(w => isPositionEqual(w, pos))
+  );
+  
+  // If no valid moves, stay in place
+  if (validMoves.length === 0) return glitch;
+  
+  // Return the first valid move (which is the preferred direction)
+  return validMoves[0];
+}
+
+// Get random move for glitch (original behavior)
+function getRandomGlitchMove(
   glitch: Position, 
   walls: Position[], 
   playerPos: Position,
@@ -56,10 +102,20 @@ export function movementLogic({
   let score = prev.score;
   let lives = prev.lives;
   let playerPosition = newPos;
+
+  // Check how many valid numbers remain
+  const remainingValidNumbers = currentRule ? 
+    updatedNumbers.filter(num => currentRule.isMatch(num.value)) : 
+    [];
   
-  // Move all glitches after player moves
+  // If only one valid number remains, glitches will chase the player
+  const shouldChase = remainingValidNumbers.length === 1;
+  
+  // Move all glitches
   let updatedGlitchPositions = prev.glitchPositions.map(glitch => 
-    getGlitchMove(glitch, prev.walls, playerPosition)
+    shouldChase ? 
+      getChaseMove(glitch, playerPosition, prev.walls) :
+      getRandomGlitchMove(glitch, prev.walls, playerPosition)
   );
 
   // Check if any glitch is on a number and remove that number
@@ -122,7 +178,10 @@ export function movementLogic({
       onGameOver(score);
       return prev;
     } else {
-      toast.error(`Lost a life! ${lives} remaining`);
+      const message = shouldChase ? 
+        "The glitches caught you! 1 life lost" : 
+        "Hit by a glitch! 1 life lost";
+      toast.error(`${message} - ${lives} remaining`);
       return {
         ...prev,
         lives,
