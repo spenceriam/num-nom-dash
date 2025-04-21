@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -91,7 +92,7 @@ const Index = () => {
                 <div className="flex justify-between items-center mb-4">
                   <div className="text-purple-900 font-semibold">Level: {level}</div>
                   <div className="text-purple-900 font-semibold flex items-center gap-1">
-                    Lives: {Array.from({ length: gameStatus.lives }).map((_, i) => (
+                    {Array.from({ length: gameStatus.lives }).map((_, i) => (
                       <Sparkles 
                         key={i}
                         className="w-5 h-5 text-green-700" 

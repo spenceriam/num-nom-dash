@@ -7,6 +7,7 @@ import { levels } from "./levels";
 import { isPositionEqual } from "./utils";
 import { usePlayerMovement } from "./usePlayerMovement";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction } from "@/components/ui/alert-dialog";
+import { Sparkles } from "lucide-react";
 
 type GameProps = {
   onGameOver: (score: number) => void;
@@ -125,7 +126,15 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
     >
       <div className="flex justify-between items-center mb-4">
         <div className="text-purple-900 font-semibold">Level: {level}</div>
-        <div className="text-purple-900 font-semibold">Lives: {gameStatus.lives}</div>
+        <div className="text-purple-900 font-semibold flex items-center gap-1">
+          {Array.from({ length: gameStatus.lives }).map((_, i) => (
+            <Sparkles 
+              key={i}
+              className="w-5 h-5 text-green-700" 
+              strokeWidth={2.5}
+            />
+          ))}
+        </div>
         <div className="text-purple-900 font-semibold">Score: {gameStatus.score}</div>
       </div>
       
