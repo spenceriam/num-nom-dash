@@ -56,7 +56,12 @@ export function processMovement({
 
   // Move all glitches and let them randomly consume numbers
   let updatedGlitchPositions = prev.glitchPositions.map(glitch => {
-    const newGlitchPos = getChaseMove(glitch, playerPosition, prev.walls);
+    const newGlitchPos = getChaseMove(
+      glitch, 
+      playerPosition, 
+      prev.walls,
+      updatedNumbers.length
+    );
 
     // Random chance (30%) to attempt consuming a number
     if (Math.random() < 0.3) {

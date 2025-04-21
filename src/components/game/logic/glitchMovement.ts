@@ -2,8 +2,47 @@
 import { Position } from "../types";
 import { isPositionEqual } from "../utils";
 
-// Get the best move for a glitch to chase the player with reduced speed
-export function getChaseMove(
+// Get random direction for the glitch
+function getRandomMove(
+  glitch: Position,
+  walls: Position[],
+  gridSize: number = 6
+): Position {
+  const directions = [
+    { x: 1, y: 0 },
+    { x: -1, y: 0 },
+    { x: 0, y: 1 },
+    { x: 0, y: -1 }
+  ];
+
+  // Shuffle directions randomly
+  for (let i = directions.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [directions[i], directions[j]] = [directions[j], directions[i]];
+  }
+
+  // Try each direction until we find a valid move
+  for (const dir of directions) {
+    const newPos = {
+      x: glitch.x + dir.x,
+      y: glitch.y + dir.y
+    };
+
+    if (
+      newPos.x >= 0 && newPos.x < gridSize &&
+      newPos.y >= 0 && newPos.y < gridSize &&
+      !walls.some(w => isPositionEqual(w, newPos))
+    ) {
+      return newPos;
+    }
+  }
+
+  // If no valid moves found, stay in place
+  return glitch;
+}
+
+// Get the best move for a glitch to chase the player
+function getChasePlayerMove(
   glitch: Position,
   playerPos: Position,
   walls: Position[],
@@ -51,4 +90,25 @@ export function getChaseMove(
   
   // Return the first valid move (which is the preferred direction)
   return validMoves[0];
+}
+
+// Main function to determine glitch movement
+export function getChaseMove(
+  glitch: Position,
+  playerPos: Position,
+  walls: Position[],
+  remainingNumbersCount: number,
+  gridSize: number = 6
+): Position {
+  // Only chase player when 1 number remains, otherwise move randomly
+  if (remainingNumbersCount <= 1) {
+    return getChasePlayerMove(glitch, playerPos, walls, gridSize);
+  }
+
+  // 50% chance to stay in place (reduces effective speed)
+  if (Math.random() < 0.5) {
+    return glitch;
+  }
+
+  return getRandomMove(glitch, walls, gridSize);
 }
