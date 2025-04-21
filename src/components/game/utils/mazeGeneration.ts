@@ -1,6 +1,6 @@
 
 import { Position } from "../types";
-import { getRandomPosition } from "./positions";
+import { isPositionEqual, getRandomPosition } from "./positions";
 import { generateExpressionEqualsTo, generateNonMatchingExpression } from "./expressions";
 
 export function generateRandomMaze(width: number, height: number) {

@@ -1,4 +1,7 @@
 
+import { Position } from "../types";
+import { isPositionEqual, getNeighbors } from "./positions";
+
 // Helper to generate expressions that equal to a target value
 export function generateExpressionEqualsTo(target: number): string {
   const operations = ['+', '-', '*', '/'];
