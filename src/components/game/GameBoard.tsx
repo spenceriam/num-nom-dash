@@ -1,4 +1,3 @@
-
 import { Position, GameRule } from "./types";
 import { isPositionEqual } from "./utils";
 import { Bug, Sparkles } from "lucide-react";
@@ -33,11 +32,11 @@ export const GameBoard = ({
       const number = numbers.find(n => isPositionEqual(n.position, position));
       
       let cellContent;
-      let cellClass = "w-full h-full flex items-center justify-center bg-white border border-[#014F86]/20";
+      let cellClass = "w-full h-full flex items-center justify-center bg-white/90 border border-[#014F86]/20";
       let isClickable = false;
 
       if (isWall) {
-        cellClass = "w-full h-full bg-gray-800";
+        cellClass = "w-full h-full bg-[#012A4A]";
         cellContent = null;
       } else if (isPlayer) {
         cellClass += " bg-green-500";
@@ -60,7 +59,7 @@ export const GameBoard = ({
           </span>
         );
       } else {
-        cellClass += " bg-white/80";
+        cellClass += " bg-white/90";
       }
 
       if (onCellClick && !isWall && !isPlayer && !isGlitch) {
@@ -91,7 +90,7 @@ export const GameBoard = ({
   }
   
   return (
-    <div className="w-full bg-white/80 backdrop-blur-sm p-1 rounded-lg shadow-inner" style={{ aspectRatio: '1/1' }}>
+    <div className="w-full bg-[#89C2D9]/10 backdrop-blur-sm p-1 rounded-lg shadow-inner" style={{ aspectRatio: '1/1' }}>
       {rows}
     </div>
   );
