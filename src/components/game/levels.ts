@@ -1,6 +1,5 @@
-
 import { GameLevel } from "./types";
-import { generateRandomMaze } from "./utils";
+import { generateRandomMaze, generateEasyMaze } from "./utils";
 
 // Define game rules
 const rules = {
@@ -41,37 +40,37 @@ export const levels: GameLevel[] = [
   {
     id: 1,
     rule: rules.evenNumbers,
-    maze: generateRandomMaze(10, 10),
-    glitchSpeed: 1
+    maze: generateEasyMaze(6, 6, rules.evenNumbers.isMatch),
+    glitchSpeed: 1,
   },
   {
     id: 2,
     rule: rules.oddNumbers,
     maze: generateRandomMaze(10, 10),
-    glitchSpeed: 1.2
+    glitchSpeed: 1.2,
   },
   {
     id: 3,
     rule: rules.multiplesOf3,
     maze: generateRandomMaze(10, 10),
-    glitchSpeed: 1.4
+    glitchSpeed: 1.4,
   },
   {
     id: 4,
     rule: rules.greaterThan50,
     maze: generateRandomMaze(10, 10),
-    glitchSpeed: 1.6
+    glitchSpeed: 1.6,
   },
   {
     id: 5,
     rule: rules.lessThan50,
     maze: generateRandomMaze(10, 10),
-    glitchSpeed: 1.8
+    glitchSpeed: 1.8,
   },
   {
     id: 6,
     rule: rules.equalsTo42,
     maze: generateRandomMaze(10, 10),
-    glitchSpeed: 2
+    glitchSpeed: 2,
   }
 ];
