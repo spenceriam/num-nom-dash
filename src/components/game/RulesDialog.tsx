@@ -1,4 +1,3 @@
-
 import {
   Dialog,
   DialogContent,
@@ -14,12 +13,12 @@ export const RulesDialog = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="secondary" size="sm">
+        <Button variant="secondary" size="sm" className="bg-white/90">
           <BookOpen className="mr-1" />
           Rules
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] bg-white/95 backdrop-blur-sm">
         <DialogHeader>
           <DialogTitle>How to Play Num Nom Dash</DialogTitle>
           <DialogDescription>

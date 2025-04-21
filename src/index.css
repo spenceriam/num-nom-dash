@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -97,5 +98,8 @@
 
   body {
     @apply bg-background text-foreground;
+    background: linear-gradient(to right, #012A4A, #013A63, #01497C, #014F86, #2A6F97, #2C7DA0, #468FAF, #61A5C2, #89C2D9, #A9D6E5);
+    min-height: 100vh;
   }
 }
+

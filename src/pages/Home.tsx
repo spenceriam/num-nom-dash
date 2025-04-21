@@ -6,8 +6,8 @@ import { RulesDialog } from "@/components/game/RulesDialog";
 
 const Home = () => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-purple-50 to-blue-100 p-4">
-      <Card className="w-full max-w-md shadow-lg border-2 border-purple-200">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-white/90 backdrop-blur-sm shadow-lg border-2 border-[#468FAF]/20">
         <CardContent className="p-6 space-y-6">
           <div className="text-center space-y-2">
             <h1 className="text-4xl font-bold text-purple-800">Num Nom Dash</h1>
