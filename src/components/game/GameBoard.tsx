@@ -36,10 +36,10 @@ export const GameBoard = ({ playerPosition, glitchPositions, walls, numbers, onC
         cellClass = "bg-gray-800";
         cellContent = null;
       } else if (isPlayer) {
-        cellClass += " bg-green-100";
+        cellClass += " bg-green-500";
         cellContent = (
           <div className="w-full h-full flex items-center justify-center">
-            <div className="w-4/5 h-4/5 rounded-full bg-green-500 flex items-center justify-center text-white font-bold">
+            <div className="w-4/5 h-4/5 rounded-full bg-green-700 flex items-center justify-center text-white font-bold shadow-md">
               N
             </div>
           </div>
@@ -55,8 +55,11 @@ export const GameBoard = ({ playerPosition, glitchPositions, walls, numbers, onC
         );
       } else if (number) {
         cellContent = (
-          <span className="text-purple-900 font-medium">{number.value}</span>
+          <span className="text-purple-900 font-bold text-lg">{number.value}</span>
         );
+      } else {
+        // Empty cell - light background so it's clear it's empty
+        cellClass += " bg-purple-50";
       }
 
       // Can only click to move into adjacent cells (if not a wall/glitch)
