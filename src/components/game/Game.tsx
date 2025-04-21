@@ -23,6 +23,7 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
   const isMobile = useIsMobile();
   const [level, setLevel] = useState(initialLevel);
   const [showLevelComplete, setShowLevelComplete] = useState(false);
+  const [showGlitches, setShowGlitches] = useState(false);
   const [gameStatus, setGameStatus] = useState<GameStatus>({
     score: 0,
     lives: INITIAL_LIVES,
@@ -120,9 +121,18 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
       walls: gameLevel.maze.walls
     }));
     
+    setShowGlitches(false);
+    
+    const glitchTimer = setTimeout(() => {
+      setShowGlitches(true);
+      toast.error("Glitches have appeared!");
+    }, 10000);
+    
     toast.success(`Level ${level}: ${gameLevel.rule.name}`, {
       description: gameLevel.rule.description,
     });
+
+    return () => clearTimeout(glitchTimer);
   }, [level]);
 
   const remainingMatchingCount = currentRule ? 
@@ -143,7 +153,7 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
       
       <GameBoard 
         playerPosition={gameStatus.playerPosition}
-        glitchPositions={gameStatus.glitchPositions}
+        glitchPositions={showGlitches ? gameStatus.glitchPositions : []}
         walls={gameStatus.walls}
         numbers={gameStatus.remainingNumbers}
         onCellClick={movePlayerByClick}
