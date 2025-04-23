@@ -76,39 +76,45 @@ const rules = {
 // Create levels with correct progression
 export const levels: GameLevel[] = [
   {
-    id: 1, // Even Numbers (Level 1) - Simple numbers
+    id: 1, // Even Numbers (Level 1)
     rule: rules.evens,
     maze: generateEasyMaze(6, 6, rules.evens.isMatch, false),
     glitchSpeed: 1,
   },
   {
-    id: 2, // Odd Numbers (Level 2) - Simple numbers
+    id: 2, // Odd Numbers (Level 2)
     rule: rules.odds,
     maze: generateEasyMaze(8, 8, rules.odds.isMatch, false),
     glitchSpeed: 1.2,
   },
   {
-    id: 3, // Factors of 9 (Level 3) - Simple numbers
-    rule: rules.factorOf9,
-    maze: generateEasyMaze(8, 8, rules.factorOf9.isMatch, false),
+    id: 3, // Equals 10 (Level 3) - Moved up
+    rule: rules.equalsTo10,
+    maze: generateEasyMaze(8, 8, rules.equalsTo10.isMatch, true),
     glitchSpeed: 1.4,
   },
   {
-    id: 4, // Equals 10 (Level 4) - Expressions
-    rule: rules.equalsTo10,
-    maze: generateEasyMaze(10, 10, rules.equalsTo10.isMatch, true),
+    id: 4, // Equals 15 (Level 4) - Moved up
+    rule: rules.equalsTo15,
+    maze: generateEasyMaze(8, 8, rules.equalsTo15.isMatch, true),
     glitchSpeed: 1.6,
   },
   {
-    id: 5, // Equals 15 (Level 5) - Expressions
-    rule: rules.equalsTo15,
-    maze: generateEasyMaze(10, 10, rules.equalsTo15.isMatch, true),
+    id: 5, // Multiply to 12 (Level 5) - Moved up
+    rule: rules.multiplyTo12,
+    maze: generateEasyMaze(10, 10, rules.multiplyTo12.isMatch, true),
     glitchSpeed: 1.8,
   },
   {
-    id: 6, // Multiply to 12 (Level 6) - Expressions
-    rule: rules.multiplyTo12,
-    maze: generateEasyMaze(10, 10, rules.multiplyTo12.isMatch, true),
+    id: 6, // Empty level - placeholder to maintain progression
+    rule: rules.equalsTo15,
+    maze: generateEasyMaze(10, 10, rules.equalsTo15.isMatch, true),
     glitchSpeed: 2,
+  },
+  {
+    id: 7, // Factors of 9 (Level 7) - Moved to end
+    rule: rules.factorOf9,
+    maze: generateEasyMaze(10, 10, rules.factorOf9.isMatch, true),
+    glitchSpeed: 2.2,
   }
 ];
