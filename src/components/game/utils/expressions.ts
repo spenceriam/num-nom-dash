@@ -1,30 +1,39 @@
-
 import { Position } from "../types";
 import { isPositionEqual, getNeighbors } from "./positions";
 
 // Helper to generate expressions that equal to a target value
 export function generateExpressionEqualsTo(target: number): string {
   const operations = ['+', '-', '*', '/'];
-  const operation = operations[Math.floor(Math.random() * 2)]; // Limit to + and - for simpler expressions
+  const operation = operations[Math.floor(Math.random() * 2)]; // Limit to + and -
+  
+  // Get the current level from the game status to determine difficulty
+  const currentLevel = window.location.search.includes('challenge') ? 
+    parseInt(localStorage.getItem('challengeLevel') || '1', 10) : 
+    parseInt(new URLSearchParams(window.location.search).get('level') || '1', 10);
+  
+  const maxNumber = currentLevel <= 3 ? 9 : // Single digits for first 3 levels
+                    currentLevel <= 6 ? 20 : // Lower two-digit numbers (10-20)
+                    currentLevel <= 10 ? 50 : // Medium two-digit numbers (up to 50)
+                    99; // Larger two-digit numbers for higher levels
   
   switch (operation) {
     case '+':
-      const addend1 = Math.floor(Math.random() * target);
+      const addend1 = Math.floor(Math.random() * Math.min(target, maxNumber));
       const addend2 = target - addend1;
       return `${addend1}+${addend2}`;
     case '-':
-      const minuend = target + Math.floor(Math.random() * 10) + 1;
+      const minuend = target + Math.floor(Math.random() * Math.min(10, maxNumber)) + 1;
       const subtrahend = minuend - target;
       return `${minuend}-${subtrahend}`;
     case '*':
-      const factors = getFactors(target);
+      const factors = getFactors(target).filter(([a, b]) => a <= maxNumber && b <= maxNumber);
       if (factors.length > 0) {
         const factorPair = factors[Math.floor(Math.random() * factors.length)];
         return `${factorPair[0]}*${factorPair[1]}`;
       }
       return `${target}*1`;
     case '/':
-      const divisor = Math.floor(Math.random() * 5) + 1;
+      const divisor = Math.floor(Math.random() * Math.min(5, maxNumber)) + 1;
       const dividend = target * divisor;
       return `${dividend}/${divisor}`;
     default:

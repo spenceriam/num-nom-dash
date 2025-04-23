@@ -49,12 +49,13 @@ const rules = {
       }
     }
   },
-  equalsTo15: {
-    name: "Equals 15",
-    description: "Collect all expressions that equal 15",
+  singleDigitPrimes: {
+    name: "Prime Numbers",
+    description: "Collect all expressions that equal prime numbers (2,3,5,7)",
     isMatch: (expression: string) => {
       try {
-        return eval(expression) === 15;
+        const primes = [2, 3, 5, 7];
+        return primes.includes(eval(expression));
       } catch {
         return false;
       }
@@ -72,74 +73,46 @@ const rules = {
         return false;
       }
     }
-  },
-  equalsTo5: {
-    name: "Equals 5",
-    description: "Collect all expressions that equal 5",
-    isMatch: (expression: string) => {
-      try {
-        return eval(expression) === 5;
-      } catch {
-        return false;
-      }
-    }
-  },
-  singleDigitPrimes: {
-    name: "Prime Numbers",
-    description: "Collect all expressions that equal prime numbers (2,3,5,7)",
-    isMatch: (expression: string) => {
-      try {
-        const primes = [2, 3, 5, 7];
-        return primes.includes(eval(expression));
-      } catch {
-        return false;
-      }
-    }
-  },
+  }
 };
 
-// Create levels with correct progression - swapping levels 3 and 4
+// Create levels with progressive difficulty
 export const levels: GameLevel[] = [
   {
-    id: 1, // Even Numbers (Level 1)
+    id: 1,
     rule: rules.evens,
     maze: generateEasyMaze(6, 6, rules.evens.isMatch, false),
     glitchSpeed: 1,
   },
   {
-    id: 2, // Odd Numbers (Level 2)
+    id: 2,
     rule: rules.odds,
     maze: generateEasyMaze(8, 8, rules.odds.isMatch, false),
     glitchSpeed: 1.2,
   },
   {
-    id: 3, // Prime Numbers (Level 3) - SWAPPED FROM LEVEL 4
+    id: 3,
     rule: rules.singleDigitPrimes,
     maze: generateEasyMaze(8, 8, rules.singleDigitPrimes.isMatch, true),
     glitchSpeed: 1.4,
   },
   {
-    id: 4, // Equals 5 (Level 4) - SWAPPED FROM LEVEL 3
-    rule: rules.equalsTo5,
-    maze: generateEasyMaze(8, 8, rules.equalsTo5.isMatch, true),
+    id: 4,
+    rule: rules.equalsTo10,
+    maze: generateEasyMaze(8, 8, rules.equalsTo10.isMatch, true),
     glitchSpeed: 1.6,
   },
   {
-    id: 5, // Equals 10 (Level 5)
-    rule: rules.equalsTo10,
-    maze: generateEasyMaze(10, 10, rules.equalsTo10.isMatch, true),
+    id: 5,
+    rule: rules.multiplyTo12,
+    maze: generateEasyMaze(10, 10, rules.multiplyTo12.isMatch, true),
     glitchSpeed: 1.8,
   },
   {
-    id: 6, // Multiply to 12 (Level 6)
-    rule: rules.multiplyTo12,
-    maze: generateEasyMaze(10, 10, rules.multiplyTo12.isMatch, true),
-    glitchSpeed: 2,
-  },
-  {
-    id: 7, // Factors of 9 (Level 7)
+    id: 6,
     rule: rules.factorOf9,
     maze: generateEasyMaze(10, 10, rules.factorOf9.isMatch, true),
-    glitchSpeed: 2.2,
+    glitchSpeed: 2,
   }
 ];
+
