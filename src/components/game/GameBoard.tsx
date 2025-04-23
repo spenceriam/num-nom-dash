@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Position, GameRule } from "./types";
 import { isPositionEqual } from "./utils";
@@ -31,14 +32,16 @@ export const GameBoard = ({
   );
 
   const renderPlayerIcon = () => (
-    <img 
-      src="/lovable-uploads/ce72a35c-6820-4164-ba07-21851bf30984.png" 
-      alt="NumNom" 
-      className="w-full h-full object-contain scale-150" 
-      style={{
-        imageRendering: 'pixelated'
-      }}
-    />
+    <div className="w-full h-full bg-[#219EBC] rounded-full flex items-center justify-center">
+      <img 
+        src="/lovable-uploads/ce72a35c-6820-4164-ba07-21851bf30984.png" 
+        alt="NumNom" 
+        className="w-full h-full object-contain scale-150" 
+        style={{
+          imageRendering: 'pixelated'
+        }}
+      />
+    </div>
   );
 
   const renderGrid = () => {
@@ -74,11 +77,7 @@ export const GameBoard = ({
             className={cellClass}
             onClick={() => onCellClick?.(position)}
           >
-            {isPlayer && (
-              <div className="w-8 h-8 rounded-full bg-[#FB8500] flex items-center justify-center">
-                {renderPlayerIcon()}
-              </div>
-            )}
+            {isPlayer && renderPlayerIcon()}
             {isGlitch && renderGlitchIcon()}
             {number && !isPlayer && !isGlitch && (
               <span className="font-mono text-[#012A4A] font-bold text-lg">
