@@ -1,4 +1,3 @@
-
 import { GameLevel } from "./types";
 import { generateRandomMaze, generateEasyMaze } from "./utils";
 
@@ -39,7 +38,7 @@ const rules = {
     }
   },
   equalsTo10: {
-    name: "Equals 10",
+    name: "Equals to..",
     description: "Collect all expressions that equal 10",
     isMatch: (expression: string) => {
       try {
@@ -115,4 +114,3 @@ export const levels: GameLevel[] = [
     glitchSpeed: 2,
   }
 ];
-
