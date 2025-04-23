@@ -60,11 +60,13 @@ const rules = {
     }
   },
   multiplyTo12: {
-    name: "Multiply to 12",
-    description: "Collect all expressions that multiply to 12",
+    name: "Single Digit Multiplication",
+    description: "Collect expressions that multiply single digits to get 12",
     isMatch: (expression: string) => {
       try {
-        return eval(expression) === 12 && expression.includes('*');
+        if (!expression.includes('*')) return false;
+        const [a, b] = expression.split('*').map(Number);
+        return a < 10 && b < 10 && eval(expression) === 12;
       } catch {
         return false;
       }
