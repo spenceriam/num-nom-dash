@@ -1,7 +1,7 @@
-
+import React from "react";
 import { Position, GameRule } from "./types";
 import { isPositionEqual } from "./utils";
-import { Bug, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 type GameBoardProps = {
   playerPosition: Position;
@@ -22,6 +22,14 @@ export const GameBoard = ({
 }: GameBoardProps) => {
   const boardSize = 6;
   const rows = [];
+
+  const renderGlitchIcon = () => (
+    <img 
+      src="/lovable-uploads/e1c8cb26-e716-48a2-8acc-4f9491e7f75d.png" 
+      alt="Glitch" 
+      className="w-4/5 h-4/5 rounded-full flex items-center justify-center text-white font-bold"
+    />
+  );
 
   for (let y = 0; y < boardSize; y++) {
     const cells = [];
@@ -48,11 +56,7 @@ export const GameBoard = ({
         );
       } else if (isGlitch) {
         cellClass += " bg-red-100";
-        cellContent = (
-          <div className="w-4/5 h-4/5 rounded-full bg-red-500 flex items-center justify-center text-white font-bold">
-            <Bug className="w-2/3 h-2/3 text-white" strokeWidth={2.5} />
-          </div>
-        );
+        cellContent = renderGlitchIcon();
       } else if (number) {
         cellContent = (
           <span className="text-[#012A4A] font-bold text-lg">
@@ -96,3 +100,5 @@ export const GameBoard = ({
     </div>
   );
 };
+
+export default GameBoard;
