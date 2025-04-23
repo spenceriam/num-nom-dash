@@ -31,8 +31,8 @@ export const GameBoard = ({
       className="w-4/5 h-4/5 object-contain"
       style={{
         imageRendering: 'pixelated',
-        imageRendering: '-moz-crisp-edges',
-        imageRendering: 'crisp-edges'
+        WebkitImageRendering: 'pixelated',
+        MozImageRendering: 'crisp-edges'
       }}
     />
   );
