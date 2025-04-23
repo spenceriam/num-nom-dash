@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Position, GameRule } from "./types";
 import { isPositionEqual } from "./utils";
@@ -27,7 +28,7 @@ export const GameBoard = ({
     <img 
       src="/lovable-uploads/e1c8cb26-e716-48a2-8acc-4f9491e7f75d.png" 
       alt="Glitch" 
-      className="w-4/5 h-4/5 object-contain image-rendering-pixel"
+      className="w-4/5 h-4/5 object-contain"
       style={{
         imageRendering: 'pixelated',
         imageRendering: '-moz-crisp-edges',
