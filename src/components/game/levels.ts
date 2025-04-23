@@ -1,3 +1,4 @@
+
 import { GameLevel } from "./types";
 import { generateRandomMaze, generateEasyMaze } from "./utils";
 
@@ -27,11 +28,11 @@ const rules = {
   },
   factorOf9: {
     name: "Factors of 9",
-    description: "Collect all expressions that are factors of 9",
+    description: "Collect all expressions that are factors of 9 (single digits)",
     isMatch: (expression: string) => {
       try {
         const result = eval(expression);
-        return result > 0 && 9 % result === 0;
+        return result > 0 && result < 10 && 9 % result === 0;
       } catch {
         return false;
       }
@@ -97,7 +98,7 @@ const rules = {
   },
 };
 
-// Create levels with correct progression
+// Create levels with correct progression - swapping levels 3 and 4
 export const levels: GameLevel[] = [
   {
     id: 1, // Even Numbers (Level 1)
@@ -112,13 +113,13 @@ export const levels: GameLevel[] = [
     glitchSpeed: 1.2,
   },
   {
-    id: 3, // Prime Numbers (Level 3)
+    id: 3, // Prime Numbers (Level 3) - SWAPPED FROM LEVEL 4
     rule: rules.singleDigitPrimes,
     maze: generateEasyMaze(8, 8, rules.singleDigitPrimes.isMatch, true),
     glitchSpeed: 1.4,
   },
   {
-    id: 4, // Equals 5 (Level 4)
+    id: 4, // Equals 5 (Level 4) - SWAPPED FROM LEVEL 3
     rule: rules.equalsTo5,
     maze: generateEasyMaze(8, 8, rules.equalsTo5.isMatch, true),
     glitchSpeed: 1.6,

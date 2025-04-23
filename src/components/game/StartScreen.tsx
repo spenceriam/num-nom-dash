@@ -3,15 +3,18 @@ import { Button } from "@/components/ui/button";
 
 type StartScreenProps = {
   onStart: () => void;
+  levelName?: string;
 };
 
-const StartScreen = ({ onStart }: StartScreenProps) => {
+const StartScreen = ({ onStart, levelName = "Game" }: StartScreenProps) => {
   return (
     <div className="flex flex-col items-center space-y-6 py-4">
       <div className="text-center space-y-3">
         <h2 className="text-xl font-semibold text-purple-800">Welcome to Num Dash!</h2>
         <p className="text-gray-600">
-          Help Num Nom navigate the maze, collect numbers that match the rule, and avoid the Glitches!
+          {levelName !== "Challenge" 
+            ? `You're about to play: ${levelName}`
+            : "Challenge Mode: Play through all levels with increasing difficulty!"}
         </p>
       </div>
       
@@ -31,7 +34,7 @@ const StartScreen = ({ onStart }: StartScreenProps) => {
         onClick={onStart}
         className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-6 rounded-full text-lg font-medium hover:opacity-90 transition-opacity"
       >
-        Start Game
+        Start {levelName}
       </Button>
     </div>
   );

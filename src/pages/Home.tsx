@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { RulesDialog } from "@/components/game/RulesDialog";
+import { levels } from "@/components/game/levels";
 
 const Home = () => {
   return (
@@ -17,28 +18,31 @@ const Home = () => {
           </div>
 
           <div className="bg-[#89C2D9]/20 p-4 rounded-lg">
-            <h2 className="font-semibold text-[#013A63] mb-2">About the Game</h2>
-            <p className="text-[#014F86] text-sm">
-              Guide Num Nom through mazes while collecting numbers that match specific rules. 
-              Watch out for Glitches that will try to stop you! Can you master all the levels?
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            <Link to="/play" className="w-full">
+            <h2 className="font-semibold text-[#013A63] mb-2">Choose a Level</h2>
+            <div className="grid grid-cols-2 gap-2 mb-4">
+              {levels.map(level => (
+                <Link key={level.id} to={`/play?level=${level.id}`}>
+                  <Button className="w-full bg-[#013A63] hover:bg-[#012A4A] text-white">
+                    Play {level.rule.name}
+                  </Button>
+                </Link>
+              ))}
+            </div>
+            
+            <Link to="/play?mode=challenge" className="block mt-4">
               <Button className="w-full bg-gradient-to-r from-[#012A4A] to-[#014F86] text-white text-lg py-6 hover:opacity-90 transition-opacity">
-                Play Game
+                Play Challenge Mode
               </Button>
             </Link>
-            
-            <div className="flex justify-between gap-2">
-              <RulesDialog />
-              <Link to="/high-scores">
-                <Button variant="secondary" className="bg-[#89C2D9]/20 text-[#012A4A] hover:bg-[#89C2D9]/30">
-                  High Scores
-                </Button>
-              </Link>
-            </div>
+          </div>
+
+          <div className="flex justify-between gap-2">
+            <RulesDialog />
+            <Link to="/high-scores">
+              <Button variant="secondary" className="bg-[#89C2D9]/20 text-[#012A4A] hover:bg-[#89C2D9]/30">
+                High Scores
+              </Button>
+            </Link>
           </div>
         </CardContent>
       </Card>

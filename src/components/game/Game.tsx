@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -15,11 +16,13 @@ type GameProps = {
   onGameOver: (score: number) => void;
   level: number;
   onUpdateGameStatus?: (status: Partial<GameStatus>) => void;
+  challengeMode?: boolean;
 };
 
 const INITIAL_LIVES = 3;
+const MAX_CHALLENGE_LEVEL = 50;
 
-const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps) => {
+const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus, challengeMode = false }: GameProps) => {
   const isMobile = useIsMobile();
   const [level, setLevel] = useState(initialLevel);
   const [showLevelComplete, setShowLevelComplete] = useState(false);
@@ -37,10 +40,41 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
   const [currentRule, setCurrentRule] = useState<GameRule | null>(null);
   const gameLoopRef = useRef<number | null>(null);
   const gameInitializedRef = useRef(false);
+  const challengeLevelRef = useRef(1);
   const navigate = useNavigate();
 
+  const getGameLevel = () => {
+    if (challengeMode) {
+      // For challenge mode, cycle through available levels and increase difficulty
+      const levelIndex = (challengeLevelRef.current - 1) % levels.length;
+      const baseLevel = levels[levelIndex];
+      
+      // Increase difficulty based on how many times we've cycled through all levels
+      const cycleCount = Math.floor((challengeLevelRef.current - 1) / levels.length);
+      const difficultyMultiplier = 1 + (cycleCount * 0.2); // 20% harder each cycle
+      
+      return {
+        ...baseLevel,
+        id: challengeLevelRef.current,
+        glitchSpeed: baseLevel.glitchSpeed * difficultyMultiplier
+      };
+    } else {
+      // Normal mode - just get the selected level
+      return levels.find(l => l.id === level) || levels[0];
+    }
+  };
+
   const handleLevelComplete = () => {
-    if (level >= levels.length) {
+    if (challengeMode) {
+      challengeLevelRef.current += 1;
+      
+      if (challengeLevelRef.current > MAX_CHALLENGE_LEVEL) {
+        onGameOver(gameStatus.score);
+      } else {
+        setLevel(challengeLevelRef.current);
+        setShowLevelComplete(false);
+      }
+    } else if (level >= levels.length) {
       onGameOver(gameStatus.score);
     } else {
       setLevel(prev => prev + 1);
@@ -72,7 +106,7 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
   useEffect(() => {
     if (gameInitializedRef.current) return;
     
-    const gameLevel = levels.find(l => l.id === level);
+    const gameLevel = getGameLevel();
     if (!gameLevel) return;
     
     setCurrentRule(gameLevel.rule);
@@ -90,7 +124,7 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
     setGameStatus(initialGameStatus);
     onUpdateGameStatus?.(initialGameStatus);
     
-    toast.success(`Level ${level}: ${gameLevel.rule.name}`, {
+    toast.success(`Level ${gameLevel.id}: ${gameLevel.rule.name}`, {
       description: gameLevel.rule.description,
     });
     
@@ -106,7 +140,7 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
   useEffect(() => {
     if (!gameInitializedRef.current) return;
     
-    const gameLevel = levels.find(l => l.id === level);
+    const gameLevel = getGameLevel();
     if (!gameLevel) return;
     
     setCurrentRule(gameLevel.rule);
@@ -131,7 +165,7 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
       toast.error("Glitches have appeared!");
     }, glitchDelay);
     
-    toast.success(`Level ${level}: ${gameLevel.rule.name}`, {
+    toast.success(`Level ${gameLevel.id}: ${gameLevel.rule.name}`, {
       description: gameLevel.rule.description,
     });
 
@@ -144,7 +178,7 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
   return (
     <div className="game-container relative bg-white/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border-2 border-[#014F86]/20">
       <GameHeader 
-        level={level} 
+        level={challengeMode ? challengeLevelRef.current : level} 
         lives={gameStatus.lives} 
         score={gameStatus.score} 
       />
@@ -172,8 +206,8 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus }: GameProps
         show={showLevelComplete}
         onOpenChange={setShowLevelComplete}
         onComplete={handleLevelComplete}
-        level={level}
-        maxLevel={levels.length}
+        level={challengeMode ? challengeLevelRef.current : level}
+        maxLevel={challengeMode ? MAX_CHALLENGE_LEVEL : levels.length}
         onStartNext={startGlitchMovement}
       />
     </div>
