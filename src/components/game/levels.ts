@@ -110,19 +110,19 @@ export const levels: GameLevel[] = [
     glitchSpeed: 1.2,
   },
   {
-    id: 3, // Equals 5 (Level 3) - Single digit target
-    rule: rules.equalsTo5,
-    maze: generateEasyMaze(8, 8, rules.equalsTo5.isMatch, true),
+    id: 3, // Prime Numbers (Level 3)
+    rule: rules.singleDigitPrimes,
+    maze: generateEasyMaze(8, 8, rules.singleDigitPrimes.isMatch, true),
     glitchSpeed: 1.4,
   },
   {
-    id: 4, // Prime Numbers (Level 4)
-    rule: rules.singleDigitPrimes,
-    maze: generateEasyMaze(8, 8, rules.singleDigitPrimes.isMatch, true),
+    id: 4, // Equals 5 (Level 4)
+    rule: rules.equalsTo5,
+    maze: generateEasyMaze(8, 8, rules.equalsTo5.isMatch, true),
     glitchSpeed: 1.6,
   },
   {
-    id: 5, // Equals 10 (Level 5) - Two digit target
+    id: 5, // Equals 10 (Level 5)
     rule: rules.equalsTo10,
     maze: generateEasyMaze(10, 10, rules.equalsTo10.isMatch, true),
     glitchSpeed: 1.8,
