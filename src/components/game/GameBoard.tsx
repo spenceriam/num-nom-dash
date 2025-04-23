@@ -32,6 +32,17 @@ export const GameBoard = ({
     />
   );
 
+  const renderPlayerIcon = () => (
+    <img 
+      src="/lovable-uploads/ce72a35c-6820-4164-ba07-21851bf30984.png" 
+      alt="NumNom" 
+      className="w-full h-full object-contain scale-150" 
+      style={{
+        imageRendering: 'pixelated'
+      }}
+    />
+  );
+
   // Determine the grid size based on positions
   const gridSize = 6; // Default size
 
@@ -71,8 +82,8 @@ export const GameBoard = ({
             onClick={() => onCellClick?.(position)}
           >
             {isPlayer && (
-              <div className="w-8 h-8 rounded-full bg-[#FB8500] flex items-center justify-center text-white font-bold">
-                N
+              <div className="w-8 h-8 rounded-full bg-[#FB8500] flex items-center justify-center">
+                {renderPlayerIcon()}
               </div>
             )}
             {isGlitch && renderGlitchIcon()}
