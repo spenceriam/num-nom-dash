@@ -26,7 +26,7 @@ const rules = {
     }
   },
   factorOf9: {
-    name: "Factors of 9",
+    name: "Factors of..",
     description: "Collect all expressions that are factors of 9 (single digits)",
     isMatch: (expression: string) => {
       try {
@@ -61,7 +61,7 @@ const rules = {
     }
   },
   multiplyTo12: {
-    name: "Single Digit Multiplication",
+    name: "Multiplies of..",
     description: "Collect expressions that multiply single digits to get 12",
     isMatch: (expression: string) => {
       try {
