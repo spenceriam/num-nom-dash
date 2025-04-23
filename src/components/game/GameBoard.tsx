@@ -27,7 +27,12 @@ export const GameBoard = ({
     <img 
       src="/lovable-uploads/e1c8cb26-e716-48a2-8acc-4f9491e7f75d.png" 
       alt="Glitch" 
-      className="w-4/5 h-4/5 rounded-full flex items-center justify-center text-white font-bold"
+      className="w-4/5 h-4/5 object-contain image-rendering-pixel"
+      style={{
+        imageRendering: 'pixelated',
+        imageRendering: '-moz-crisp-edges',
+        imageRendering: 'crisp-edges'
+      }}
     />
   );
 
