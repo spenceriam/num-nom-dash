@@ -1,8 +1,6 @@
-
 import React from "react";
 import { Position, GameRule } from "./types";
 import { isPositionEqual } from "./utils";
-import { Sparkles } from "lucide-react";
 
 type GameBoardProps = {
   playerPosition: Position;
@@ -43,14 +41,10 @@ export const GameBoard = ({
     />
   );
 
-  // Determine the grid size based on positions
-  const gridSize = 6; // Default size
-
-  // Create grid cells for the board
   const renderGrid = () => {
     const cells = [];
-    for (let y = 0; y < gridSize; y++) {
-      for (let x = 0; x < gridSize; x++) {
+    for (let y = 0; y < 6; y++) {
+      for (let x = 0; x < 6; x++) {
         const position = { x, y };
         const isPlayer = isPositionEqual(position, playerPosition);
         const isWall = walls.some(wall => isPositionEqual(wall, position));
@@ -66,7 +60,6 @@ export const GameBoard = ({
         } else if (isGlitch) {
           cellClass += " bg-[#8ECAE6]/20";
         } else if (number) {
-          // Check if this number matches the rule
           const isMatching = currentRule?.isMatch(number.value);
           cellClass += isMatching 
             ? " bg-[#8ECAE6]/30 hover:bg-[#8ECAE6]/50" 
