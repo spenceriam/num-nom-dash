@@ -30,9 +30,7 @@ export const GameBoard = ({
       alt="Glitch" 
       className="w-4/5 h-4/5 object-contain"
       style={{
-        imageRendering: 'pixelated',
-        WebkitImageRendering: 'pixelated',
-        MozImageRendering: 'crisp-edges'
+        imageRendering: 'pixelated'
       }}
     />
   );
