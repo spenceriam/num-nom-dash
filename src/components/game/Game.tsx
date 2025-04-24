@@ -6,7 +6,8 @@ import { useGameInitialization } from "./hooks/useGameInitialization";
 import { usePlayerMovement } from "./usePlayerMovement";
 import { GameContainer } from "./components/GameContainer";
 import { LevelCompleteDialog } from "./components/LevelCompleteDialog";
-import { Position } from "./types";
+import { Position, GameStatus } from "./types";
+import { levels } from "./levels";
 
 type GameProps = {
   onGameOver: (score: number) => void;
