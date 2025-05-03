@@ -1,12 +1,13 @@
 
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction } from "@/components/ui/alert-dialog";
-import { levels } from "../levels";
+import { gameTypes } from "../levels";
 
 type LevelCompleteDialogProps = {
   show: boolean;
   onOpenChange: (open: boolean) => void;
   onComplete: () => void;
   level: number;
+  gameTypeId?: string;
   maxLevel: number;
   onStartNext?: () => void;
 };
@@ -16,10 +17,11 @@ export const LevelCompleteDialog = ({
   onOpenChange, 
   onComplete, 
   level, 
+  gameTypeId,
   maxLevel,
   onStartNext
 }: LevelCompleteDialogProps) => {
-  const nextLevel = levels.find(l => l.id === level + 1);
+  const gameType = gameTypeId ? gameTypes.find(gt => gt.id === gameTypeId) : null;
   
   const handleComplete = () => {
     onComplete();
@@ -35,13 +37,16 @@ export const LevelCompleteDialog = ({
           <AlertDialogTitle>Level Complete!</AlertDialogTitle>
           <AlertDialogDescription className="space-y-2">
             {level >= maxLevel 
-              ? "Congratulations! You've completed all levels!"
+              ? "Congratulations! You've reached the maximum level!"
               : (
                 <>
                   <p>Get ready for Level {level + 1}!</p>
-                  <p className="text-[#1EAEDB] font-semibold">
-                    Next rule: {nextLevel?.rule.name}
-                  </p>
+                  {gameType && (
+                    <p className={`font-semibold ${gameType.color} bg-opacity-20 text-gray-800 px-2 py-1 rounded`}>
+                      Game Type: {gameType.name}
+                    </p>
+                  )}
+                  <p>The challenge gets harder as you progress!</p>
                 </>
               )}
           </AlertDialogDescription>

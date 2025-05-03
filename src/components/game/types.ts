@@ -17,7 +17,7 @@ export type GameRule = {
 
 export type Cell = {
   type: CellType;
-  value?: string; // Updated from number to string to support expressions
+  value?: string;
   position: Position;
 };
 
@@ -25,7 +25,7 @@ export type MazeConfig = {
   width: number;
   height: number;
   walls: Position[];
-  numbers: { position: Position; value: string }[]; // Updated from number to string
+  numbers: { position: Position; value: string }[];
   glitches: Position[];
   playerStart: Position;
 };
@@ -37,14 +37,25 @@ export type GameLevel = {
   glitchSpeed: number;
 };
 
+// New types for game type-based structure
+export type GameType = {
+  id: string;
+  name: string;
+  description: string;
+  rule: GameRule;
+  color: string;
+  icon?: string;
+};
+
 // Game state
 export type GameStatus = {
   score: number;
   lives: number;
   level: number;
   playerPosition: Position;
-  playerStart: Position; // Add this property to store the starting position
+  playerStart: Position;
   glitchPositions: Position[];
-  remainingNumbers: { position: Position; value: string }[]; // Updated from number to string
+  remainingNumbers: { position: Position; value: string }[];
   walls: Position[];
+  gameTypeId?: string;
 };

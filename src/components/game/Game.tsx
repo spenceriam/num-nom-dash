@@ -7,16 +7,23 @@ import { usePlayerMovement } from "./usePlayerMovement";
 import { GameContainer } from "./components/GameContainer";
 import { LevelCompleteDialog } from "./components/LevelCompleteDialog";
 import { Position, GameStatus } from "./types";
-import { levels } from "./levels";
+import { levels, gameTypes, generateLevel } from "./levels";
 
 type GameProps = {
   onGameOver: (score: number) => void;
-  level: number;
+  level?: number;
+  gameTypeId?: string;
   onUpdateGameStatus?: (status: Partial<GameStatus>) => void;
   challengeMode?: boolean;
 };
 
-const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus, challengeMode = false }: GameProps) => {
+const Game = ({ 
+  onGameOver, 
+  level: initialLevel = 1, 
+  gameTypeId: initialGameType, 
+  onUpdateGameStatus, 
+  challengeMode = false 
+}: GameProps) => {
   const navigate = useNavigate();
   const {
     level,
@@ -29,15 +36,19 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus, challengeMo
     setGameStatus,
     currentRule,
     setCurrentRule,
+    gameTypeId,
+    setGameTypeId,
     challengeLevelLimit
   } = useGameState({
     initialLevel,
+    initialGameType,
     onUpdateGameStatus,
     challengeMode
   });
 
   const { getGameLevel, challengeLevelRef } = useGameInitialization({
     level,
+    gameTypeId,
     challengeMode,
     setCurrentRule,
     setGameStatus,
@@ -70,9 +81,8 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus, challengeMo
         setLevel(challengeLevelRef.current);
         setShowLevelComplete(false);
       }
-    } else if (level >= levels.length) {
-      onGameOver(gameStatus.score);
     } else {
+      // Progress to the next level within the same game type
       setLevel(prev => prev + 1);
       setShowLevelComplete(false);
     }
@@ -92,6 +102,7 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus, challengeMo
         gameStatus={gameStatus}
         currentRule={currentRule}
         level={challengeMode ? challengeLevelRef.current : level}
+        gameTypeId={gameTypeId}
         onCellClick={handleCellClick}
         onNewGame={handleNewGame}
         showGlitches={showGlitches}
@@ -102,7 +113,8 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus, challengeMo
         onOpenChange={setShowLevelComplete}
         onComplete={handleLevelComplete}
         level={challengeMode ? challengeLevelRef.current : level}
-        maxLevel={challengeMode ? challengeLevelLimit : levels.length}
+        gameTypeId={gameTypeId}
+        maxLevel={challengeMode ? challengeLevelLimit : 50}
         onStartNext={startGlitchMovement}
       />
     </>

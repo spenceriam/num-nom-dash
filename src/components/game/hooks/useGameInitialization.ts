@@ -2,10 +2,11 @@
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { GameStatus, GameRule } from "../types";
-import { levels } from "../levels";
+import { levels, gameTypes, generateLevel } from "../levels";
 
 type UseGameInitializationProps = {
   level: number;
+  gameTypeId?: string;
   challengeMode?: boolean;
   setCurrentRule: (rule: GameRule) => void;
   setGameStatus: (status: GameStatus | ((prev: GameStatus) => GameStatus)) => void;
@@ -15,6 +16,7 @@ type UseGameInitializationProps = {
 
 export const useGameInitialization = ({
   level,
+  gameTypeId,
   challengeMode,
   setCurrentRule,
   setGameStatus,
@@ -37,7 +39,11 @@ export const useGameInitialization = ({
         id: challengeLevelRef.current,
         glitchSpeed: baseLevel.glitchSpeed * difficultyMultiplier
       };
+    } else if (gameTypeId) {
+      // Generate a level for the specific game type with appropriate difficulty
+      return generateLevel(gameTypeId, level);
     } else {
+      // Fallback to the old levels system
       return levels.find(l => l.id === level) || levels[0];
     }
   };
@@ -57,14 +63,24 @@ export const useGameInitialization = ({
       playerStart: gameLevel.maze.playerStart,
       glitchPositions: gameLevel.maze.glitches,
       remainingNumbers: gameLevel.maze.numbers,
-      walls: gameLevel.maze.walls
+      walls: gameLevel.maze.walls,
+      gameTypeId
     };
     
     setGameStatus(initialGameStatus);
     onUpdateGameStatus?.(initialGameStatus);
+
+    // Get the game type name for the toast
+    let gameName = gameLevel.rule.name;
+    if (gameTypeId) {
+      const gameType = gameTypes.find(gt => gt.id === gameTypeId);
+      if (gameType) {
+        gameName = gameType.name;
+      }
+    }
     
-    toast.success(`Level ${gameLevel.id}: ${gameLevel.rule.name}`, {
-      description: gameLevel.rule.description,
+    toast.success(`Level ${level}: ${gameName}`, {
+      description: `${gameLevel.rule.description} ${challengeMode ? "(Challenge Mode)" : ""}`,
     });
     
     gameInitializedRef.current = true;
@@ -74,7 +90,7 @@ export const useGameInitialization = ({
         cancelAnimationFrame(gameLoopRef.current);
       }
     };
-  }, [level]);
+  }, [level, gameTypeId]);
 
   return {
     getGameLevel,
