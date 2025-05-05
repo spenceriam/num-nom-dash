@@ -3,8 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { RulesDialog } from "@/components/game/RulesDialog";
-import { gameTypes } from "@/components/game/levels";
-import { Trophy } from "lucide-react";
+import { levels } from "@/components/game/levels";
 
 const Home = () => {
   return (
@@ -19,12 +18,12 @@ const Home = () => {
           </div>
 
           <div className="bg-[#89C2D9]/20 p-4 rounded-lg">
-            <h2 className="font-semibold text-[#013A63] mb-2">Choose a Game Type</h2>
+            <h2 className="font-semibold text-[#013A63] mb-2">Choose a Level</h2>
             <div className="grid grid-cols-2 gap-2 mb-4">
-              {gameTypes.map(gameType => (
-                <Link key={gameType.id} to={`/play?gameType=${gameType.id}`}>
-                  <Button className={`w-full ${gameType.color} hover:opacity-90 text-white`}>
-                    Play {gameType.name}
+              {levels.map(level => (
+                <Link key={level.id} to={`/play?level=${level.id}`}>
+                  <Button className="w-full bg-[#013A63] hover:bg-[#012A4A] text-white">
+                    Play {level.rule.name}
                   </Button>
                 </Link>
               ))}
@@ -40,8 +39,7 @@ const Home = () => {
           <div className="flex justify-between gap-2">
             <RulesDialog />
             <Link to="/high-scores">
-              <Button variant="secondary" className="bg-[#89C2D9]/20 text-[#012A4A] hover:bg-[#89C2D9]/30 flex items-center gap-2">
-                <Trophy size={16} />
+              <Button variant="secondary" className="bg-[#89C2D9]/20 text-[#012A4A] hover:bg-[#89C2D9]/30">
                 High Scores
               </Button>
             </Link>
