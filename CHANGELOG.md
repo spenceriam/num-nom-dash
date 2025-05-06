@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced level generation with difficulty progression (4x4 to 6x6 grids)
 - Dynamic wall and glitch placement based on level difficulty
 - Challenge mode with rotating game types
+- Sanity check instructions in CLAUDE.md to verify builds before commits
 
 ### Changed
 - Refactored types.ts with updated interfaces and type definitions
@@ -23,9 +24,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced maze generation algorithm with better expression placement
 - Replaced eval() with Function() for slightly improved security in expression evaluation
 - Better mathematical symbols for multiplication (×) and division (÷)
+- Updated player movement to handle dynamic grid sizes
+- Improved rule description display with target number interpolation
 
 ### Fixed
-- N/A
+- Fixed duplicate game type buttons on home screen
+- Fixed GameCell rule validation for expressions
+- Fixed player movement bounds based on grid size
+- Fixed GameContainer to pass targetNumber to child components
 
 ## [0.5.0] - 2025-05-05
 
