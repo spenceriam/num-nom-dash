@@ -1,10 +1,135 @@
-
-import { Position } from "../types";
+import { Position, MazeConfig, GameType, Rule, Expression } from "../types";
 import { isPositionEqual, getRandomPosition } from "./positions";
-import { generateExpressionEqualsTo, generateNonMatchingExpression } from "./expressions";
+import { 
+  generateExpressionsByLevel, 
+  createExpression, 
+  evaluateExpression,
+  hasDuplicateNeighbor
+} from "./expressions";
 
-export function generateRandomMaze(width: number, height: number) {
-  const gridSize = 6;
+// Generate a level-appropriate maze based on game type and level
+export function generateMaze(
+  level: number,
+  rule: Rule,
+  useExpressions: boolean = true
+): MazeConfig {
+  // Grid size increases with level
+  const gridSize = 4 + Math.min(Math.floor(level / 3), 2); // 4x4 to 6x6
+  
+  // Generate target number for applicable game types
+  let targetNumber: number | undefined;
+  if (rule.generateTarget) {
+    targetNumber = rule.generateTarget();
+  }
+  
+  // Initialize maze components
+  const walls: Position[] = [];
+  const playerStart = getRandomPosition(gridSize);
+  
+  // Add walls based on level (higher levels have more walls)
+  if (level > 3) {
+    const wallCount = Math.min(Math.floor(level / 2), 5);
+    for (let i = 0; i < wallCount; i++) {
+      const wallPos = getRandomPosition(gridSize, [playerStart, ...walls]);
+      walls.push(wallPos);
+    }
+  }
+  
+  // Add glitches (more glitches at higher levels)
+  const glitchCount = Math.min(Math.floor(level / 3) + 1, 3); // 1-3 glitches
+  const glitches: Position[] = [];
+  
+  for (let i = 0; i < glitchCount; i++) {
+    const glitchPos = getRandomPosition(gridSize, [playerStart, ...walls, ...glitches]);
+    glitches.push(glitchPos);
+  }
+  
+  // Calculate number of valid cells to include (scales with level and grid size)
+  const validCellRatio = 0.3 + (Math.min(level, 10) / 100); // Increases slightly with level
+  const validCellCount = Math.max(
+    5, 
+    Math.floor((gridSize * gridSize - walls.length - glitches.length - 1) * validCellRatio)
+  );
+  
+  // Generate valid and invalid expressions
+  const numbers: { position: Position; value: string; expression?: Expression }[] = [];
+  const usedPositions = [playerStart, ...walls, ...glitches];
+  
+  // Add valid cells that match the rule
+  for (let i = 0; i < validCellCount; i++) {
+    const position = getRandomPosition(gridSize, usedPositions);
+    usedPositions.push(position);
+    
+    // Generate an expression that matches the rule
+    let expression: Expression;
+    if (useExpressions && rule.generateExpressions && targetNumber !== undefined) {
+      // Use rule-specific expression generator for operation-based games
+      const expressions = rule.generateExpressions(targetNumber, 1);
+      expression = expressions[0];
+    } else {
+      // Generate level-appropriate expression
+      expression = generateExpressionsByLevel(
+        level, 
+        rule.type as GameType, 
+        targetNumber,
+        true // Should match rule
+      );
+    }
+    
+    numbers.push({
+      position,
+      value: expression.display,
+      expression: expression
+    });
+  }
+  
+  // Fill remaining cells with invalid expressions
+  const remainingCellCount = gridSize * gridSize - usedPositions.length;
+  
+  for (let i = 0; i < remainingCellCount; i++) {
+    const position = getRandomPosition(gridSize, usedPositions);
+    usedPositions.push(position);
+    
+    // Try multiple times to generate a non-matching expression that's not too similar to existing ones
+    let attempts = 0;
+    let expression: Expression;
+    let value: string;
+    
+    do {
+      // Generate non-matching expression
+      expression = generateExpressionsByLevel(
+        level,
+        rule.type as GameType,
+        targetNumber,
+        false // Should NOT match rule
+      );
+      value = expression.display;
+      attempts++;
+    } while (
+      hasDuplicateNeighbor(position, value, numbers, gridSize) &&
+      attempts < 5
+    );
+    
+    numbers.push({
+      position,
+      value,
+      expression
+    });
+  }
+  
+  return {
+    width: gridSize,
+    height: gridSize,
+    walls,
+    numbers,
+    glitches,
+    playerStart
+  };
+}
+
+// Legacy function for backward compatibility
+export function generateRandomMaze(width: number, height: number): MazeConfig {
+  const gridSize = width;
   const walls: Position[] = [];
   
   // Place player at random position
@@ -41,13 +166,14 @@ export function generateRandomMaze(width: number, height: number) {
   };
 }
 
+// Legacy function for backward compatibility
 export function generateEasyMaze(
   width: number, 
   height: number,
-  rule: (expression: string) => boolean,
+  ruleValidator: (expression: string) => boolean,
   useExpressions: boolean = false
-) {
-  const gridSize = 6;
+): MazeConfig {
+  const gridSize = width;
   const walls: Position[] = [];
   
   // Randomly place player
@@ -89,21 +215,23 @@ export function generateEasyMaze(
     let value: string;
 
     if (useExpressions) {
-      if (rule.toString().includes("equalsTo10")) {
-        value = generateExpressionEqualsTo(10);
-      } else if (rule.toString().includes("equalsTo15")) {
-        value = generateExpressionEqualsTo(15);
-      } else if (rule.toString().includes("multiplyTo12")) {
-        value = `${Math.floor(Math.random() * 4) + 1}*${12 / (Math.floor(Math.random() * 4) + 1)}`;
+      if (ruleValidator.toString().includes("equalsTo10")) {
+        value = Math.random() > 0.5 
+          ? `${Math.floor(Math.random() * 10)}+${10 - Math.floor(Math.random() * 10)}`
+          : `${10 + Math.floor(Math.random() * 5)}-${Math.floor(Math.random() * 5)}`;
+      } else if (ruleValidator.toString().includes("multiplyTo12")) {
+        const factors = [1, 2, 3, 4, 6, 12];
+        const a = factors[Math.floor(Math.random() * factors.length)];
+        value = `${a}×${12 / a}`;
       } else {
-        value = generateExpressionEqualsTo(10); // fallback
+        value = Math.floor(Math.random() * 20 + 1).toString();
       }
     } else {
-      if (rule.toString().includes("evens")) {
+      if (ruleValidator.toString().includes("evens")) {
         value = (Math.floor(Math.random() * 10 + 1) * 2).toString();
-      } else if (rule.toString().includes("odds")) {
+      } else if (ruleValidator.toString().includes("odds")) {
         value = (Math.floor(Math.random() * 10) * 2 + 1).toString();
-      } else if (rule.toString().includes("factorOf9")) {
+      } else if (ruleValidator.toString().includes("factorOf9")) {
         const factors = [1, 3, 9];
         value = factors[Math.floor(Math.random() * factors.length)].toString();
       } else {
@@ -111,34 +239,52 @@ export function generateEasyMaze(
       }
     }
     
-    numbers.push({ position, value });
-    ruleMatchingAdded++;
+    // Validate using the provided rule function
+    if (ruleValidator(value)) {
+      numbers.push({ position, value });
+      ruleMatchingAdded++;
+    } else {
+      // Put back in the list if not matching
+      remainingPositions.unshift(position);
+    }
   }
 
   // Fill remaining positions with non-matching values
   while (remainingPositions.length > 0) {
     const position = remainingPositions.pop()!;
     let value: string;
+    let attempts = 0;
+    let isValid = false;
 
-    if (useExpressions) {
-      value = generateNonMatchingExpression(10);
-    } else {
-      if (rule.toString().includes("evens")) {
-        value = (Math.floor(Math.random() * 10) * 2 + 1).toString();
-      } else if (rule.toString().includes("odds")) {
-        value = (Math.floor(Math.random() * 10 + 1) * 2).toString();
-      } else if (rule.toString().includes("factorOf9")) {
-        let num;
-        do {
-          num = Math.floor(Math.random() * 8 + 2);
-        } while (9 % num === 0);
-        value = num.toString();
+    while (!isValid && attempts < 5) {
+      if (useExpressions) {
+        const target = Math.floor(Math.random() * 20) + 1;
+        value = Math.random() > 0.5 
+          ? `${Math.floor(Math.random() * 10)}+${target - Math.floor(Math.random() * 10)}`
+          : `${target + Math.floor(Math.random() * 5)}-${Math.floor(Math.random() * 5)}`;
       } else {
-        value = Math.floor(Math.random() * 20 + 1).toString();
+        if (ruleValidator.toString().includes("evens")) {
+          value = (Math.floor(Math.random() * 10) * 2 + 1).toString(); // Odd numbers
+        } else if (ruleValidator.toString().includes("odds")) {
+          value = (Math.floor(Math.random() * 10 + 1) * 2).toString(); // Even numbers
+        } else if (ruleValidator.toString().includes("factorOf9")) {
+          let num;
+          do {
+            num = Math.floor(Math.random() * 8 + 2);
+          } while (9 % num === 0);
+          value = num.toString();
+        } else {
+          value = Math.floor(Math.random() * 20 + 1).toString();
+        }
       }
+      
+      // Check that it does NOT match the rule and is not a duplicate neighbor
+      isValid = !ruleValidator(value) && !hasDuplicateNeighbor(position, value, numbers, gridSize);
+      attempts++;
     }
-    
-    numbers.push({ position, value });
+
+    // Add the non-matching value (or whatever we ended up with)
+    numbers.push({ position, value: value! });
   }
 
   return {

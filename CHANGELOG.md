@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - In Progress
+
+### Added
+- New game types as specified in PRD: Even, Odd, Prime, AdditionsOf, MultiplesOf, FactorsOf, SubtractionsOf
+- Expression interface with display, value, operation, and operands properties
+- Rule interface with validate, description, and target generation capabilities
+- Enhanced level generation with difficulty progression (4x4 to 6x6 grids)
+- Dynamic wall and glitch placement based on level difficulty
+- Challenge mode with rotating game types
+
+### Changed
+- Refactored types.ts with updated interfaces and type definitions
+- Improved expression handling for different operation types (addition, subtraction, multiplication, division)
+- Enhanced maze generation algorithm with better expression placement
+- Replaced eval() with Function() for slightly improved security in expression evaluation
+- Better mathematical symbols for multiplication (×) and division (÷)
+
+### Fixed
+- N/A
+
 ## [0.5.0] - 2025-05-05
 
 ### Added
