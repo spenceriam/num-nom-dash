@@ -1,14 +1,14 @@
-
 import { useEffect } from "react";
-import { Direction, GameStatus, GameRule, Position } from "./types";
+import { Direction, GameStatus, Rule, Position } from "./types";
 import { processMovement } from "./movementLogic";
 
 type UseKeyboardMovementProps = {
   setGameStatus: React.Dispatch<React.SetStateAction<GameStatus>>;
   gameStatus: GameStatus;
-  currentRule: GameRule | null;
+  currentRule: Rule | null;
   onGameOver: (score: number) => void;
   onLevelComplete?: () => void;
+  targetNumber?: number;
 };
 
 export function useKeyboardMovement({
@@ -17,6 +17,7 @@ export function useKeyboardMovement({
   currentRule,
   onGameOver,
   onLevelComplete,
+  targetNumber,
 }: UseKeyboardMovementProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -54,6 +55,16 @@ export function useKeyboardMovement({
           break;
       }
 
+      // Get grid size based on current game state
+      const gridSize = Math.max(
+        4, // Minimum grid size
+        Math.max(
+          ...gameStatus.remainingNumbers.map(n => Math.max(n.position.x, n.position.y)),
+          ...gameStatus.walls.map(w => Math.max(w.x, w.y)),
+          ...gameStatus.glitchPositions.map(g => Math.max(g.x, g.y))
+        ) + 1
+      );
+
       if (direction) {
         setGameStatus((prev) => {
           let newPos = { ...prev.playerPosition };
@@ -62,13 +73,13 @@ export function useKeyboardMovement({
               newPos.y = Math.max(0, newPos.y - 1);
               break;
             case "down":
-              newPos.y = Math.min(5, newPos.y + 1);
+              newPos.y = Math.min(gridSize - 1, newPos.y + 1);
               break;
             case "left":
               newPos.x = Math.max(0, newPos.x - 1);
               break;
             case "right":
-              newPos.x = Math.min(5, newPos.x + 1);
+              newPos.x = Math.min(gridSize - 1, newPos.x + 1);
               break;
           }
           return processMovement({ 
@@ -76,7 +87,8 @@ export function useKeyboardMovement({
             newPos, 
             currentRule, 
             onGameOver,
-            onLevelComplete 
+            onLevelComplete,
+            targetNumber
           });
         });
         e.preventDefault();
@@ -84,15 +96,16 @@ export function useKeyboardMovement({
         setGameStatus((prev) => {
           const { playerPosition } = prev;
           const newPos = {
-            x: Math.max(0, Math.min(5, playerPosition.x + diagonal!.dx)),
-            y: Math.max(0, Math.min(5, playerPosition.y + diagonal!.dy)),
+            x: Math.max(0, Math.min(gridSize - 1, playerPosition.x + diagonal!.dx)),
+            y: Math.max(0, Math.min(gridSize - 1, playerPosition.y + diagonal!.dy)),
           };
           return processMovement({ 
             prev, 
             newPos, 
             currentRule, 
             onGameOver,
-            onLevelComplete 
+            onLevelComplete,
+            targetNumber
           });
         });
         e.preventDefault();
@@ -101,6 +114,5 @@ export function useKeyboardMovement({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-    // eslint-disable-next-line
-  }, [gameStatus, currentRule, onGameOver, setGameStatus, onLevelComplete]);
+  }, [gameStatus, currentRule, onGameOver, setGameStatus, onLevelComplete, targetNumber]);
 }

@@ -1,15 +1,15 @@
-
 import React from "react";
-import { Position, GameRule } from "../types";
+import { Position, Rule, Expression } from "../types";
 import { isPositionEqual } from "../utils";
+import { evaluateExpression } from "../utils/expressions";
 
 type GameCellProps = {
   position: Position;
   playerPosition: Position;
   glitchPositions: Position[];
   walls: Position[];
-  numbers: { position: Position; value: string }[];
-  currentRule: GameRule | null;
+  numbers: { position: Position; value: string; expression?: Expression }[];
+  currentRule: Rule | null;
   onCellClick?: (position: Position) => void;
 };
 
@@ -26,6 +26,24 @@ export const GameCell = ({
   const isWall = walls.some(wall => isPositionEqual(wall, position));
   const isGlitch = glitchPositions.some(glitch => isPositionEqual(glitch, position));
   const number = numbers.find(num => isPositionEqual(num.position, position));
+
+  // Check if the cell matches the current rule
+  const isMatchingRule = () => {
+    if (!number || !currentRule) return false;
+    
+    // If we have an expression object, use its value
+    if (number.expression) {
+      return currentRule.validate(number.expression.value);
+    }
+    
+    // Otherwise, evaluate the value string
+    try {
+      const value = evaluateExpression(number.value);
+      return currentRule.validate(value);
+    } catch (e) {
+      return false;
+    }
+  };
 
   const renderGlitchIcon = () => (
     <img 
@@ -60,8 +78,8 @@ export const GameCell = ({
   } else if (isGlitch) {
     cellClass += " bg-[#8ECAE6]/20";
   } else if (number) {
-    const isMatching = currentRule?.isMatch(number.value);
-    cellClass += isMatching 
+    const matchesRule = isMatchingRule();
+    cellClass += matchesRule 
       ? " bg-[#8ECAE6]/30 hover:bg-[#8ECAE6]/50" 
       : " bg-[#FB8500]/20 hover:bg-[#FB8500]/40";
   } else {
@@ -83,4 +101,3 @@ export const GameCell = ({
     </div>
   );
 };
-

@@ -49,6 +49,7 @@ Num-Nom-Dash is a mathematical maze game built with React, TypeScript, and Vite.
 
 4. **Game Logic**
    - Mathematical rule evaluation based on expressions
+   - `rules.ts`: Provides rule definitions and validation logic
    - Mazes are generated dynamically with walls, player position, and target numbers
    - Glitch entities move towards the player, adding difficulty
 
@@ -61,6 +62,7 @@ Num-Nom-Dash is a mathematical maze game built with React, TypeScript, and Vite.
 - `/src/components/game/Game.tsx`: Main game component
 - `/src/components/game/types.ts`: Type definitions for game entities
 - `/src/components/game/levels.ts`: Game level definitions and rules
+- `/src/components/game/rules.ts`: Rule definitions and validation logic
 - `/src/components/game/hooks/`: Custom hooks for game mechanics
 - `/src/pages/Index.tsx`: Manages overall game flow and state transitions
 
@@ -73,6 +75,11 @@ Num-Nom-Dash is a mathematical maze game built with React, TypeScript, and Vite.
 
 ## Housekeeping Notes
 
+- Always perform a sanity check before committing changes:
+  1. Run `npm run build` to verify no build errors
+  2. Run `npm run dev` and do a quick visual check of the application
+  3. Verify key functionality works: level selection, game play, rule validation
+  4. Check for any UI issues like duplicate buttons, formatting problems, etc.
 - Always request after a significant change to the codebase to create a git commit and push to origin - Github repo: https://github.com/spenceriam/num-nom-dash
 - Check if a changelog.md exists and update it with any changes made to the codebase using https://keepachangelog.com/en/1.1.0/ as a reference or template. Always put the current date and changes made starting with version 0.5.0
 - Check if a todo.md exists and update it with any changes made to the codebase using https://github.com/todomd/todo.md/blob/master/TODO.md as a reference or template. Always put the current date and changes made starting with version 0.5.0
@@ -86,4 +93,4 @@ Num-Nom-Dash is a mathematical maze game built with React, TypeScript, and Vite.
 - Ensure that the visual changes are consistent with the game's overall aesthetic
 - Ensure that the visual changes are consistent with the game's overall theme
 - Ensure that the visual changes are consistent with the game's overall style
-- Ensure that this is a mobile first design, then scale up to large screens only for the background.  The game board should always be the same size as the mobile version unless the screen size is too small to fit the game board then scale down
+- Ensure that this is a mobile first design, then scale up to large screens only for the background. The game board should always be the same size as the mobile version unless the screen size is too small to fit the game board then scale down

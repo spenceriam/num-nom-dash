@@ -1,16 +1,16 @@
-
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
-import { GameStatus, GameRule } from "../types";
-import { levels } from "../levels";
+import { GameStatus, Rule, GameType } from "../types";
+import { getLevelByNumber } from "../levels";
 
 type UseGameInitializationProps = {
   level: number;
   challengeMode?: boolean;
-  setCurrentRule: (rule: GameRule) => void;
+  setCurrentRule: (rule: Rule) => void;
   setGameStatus: (status: GameStatus | ((prev: GameStatus) => GameStatus)) => void;
   onUpdateGameStatus?: (status: Partial<GameStatus>) => void;
   gameStatus: GameStatus;
+  setTargetNumber: (target: number | undefined) => void;
 };
 
 export const useGameInitialization = ({
@@ -20,6 +20,7 @@ export const useGameInitialization = ({
   setGameStatus,
   onUpdateGameStatus,
   gameStatus,
+  setTargetNumber,
 }: UseGameInitializationProps) => {
   const gameInitializedRef = useRef(false);
   const challengeLevelRef = useRef(1);
@@ -27,20 +28,16 @@ export const useGameInitialization = ({
 
   const getGameLevel = () => {
     if (challengeMode) {
-      const levelIndex = (challengeLevelRef.current - 1) % levels.length;
-      const baseLevel = levels[levelIndex];
-      const cycleCount = Math.floor((challengeLevelRef.current - 1) / levels.length);
-      const difficultyMultiplier = 1 + (cycleCount * 0.2);
-      
-      return {
-        ...baseLevel,
-        id: challengeLevelRef.current,
-        glitchSpeed: baseLevel.glitchSpeed * difficultyMultiplier
-      };
+      return getLevelByNumber(challengeLevelRef.current, true);
     } else {
-      return levels.find(l => l.id === level) || levels[0];
+      return getLevelByNumber(level);
     }
   };
+
+  useEffect(() => {
+    // Reset the initialization flag when level changes
+    gameInitializedRef.current = false;
+  }, [level]);
 
   useEffect(() => {
     if (gameInitializedRef.current) return;
@@ -48,23 +45,37 @@ export const useGameInitialization = ({
     const gameLevel = getGameLevel();
     if (!gameLevel) return;
     
+    // Set the current rule and target number (if applicable)
     setCurrentRule(gameLevel.rule);
-    const initialGameStatus = {
+    setTargetNumber(gameLevel.targetNumber);
+    
+    // Initialize game status with level data
+    const initialGameStatus: GameStatus = {
       score: gameStatus.score,
       lives: 3,
-      level,
+      level: gameLevel.id,
       playerPosition: gameLevel.maze.playerStart,
       playerStart: gameLevel.maze.playerStart,
       glitchPositions: gameLevel.maze.glitches,
       remainingNumbers: gameLevel.maze.numbers,
-      walls: gameLevel.maze.walls
+      walls: gameLevel.maze.walls,
+      currentRule: gameLevel.rule,
+      gameType: gameLevel.rule.type as GameType,
+      targetNumber: gameLevel.targetNumber
     };
     
     setGameStatus(initialGameStatus);
     onUpdateGameStatus?.(initialGameStatus);
     
+    // Format rule description with target if needed
+    let description = gameLevel.rule.description;
+    if (gameLevel.targetNumber && description.includes('[target]')) {
+      description = description.replace('[target]', gameLevel.targetNumber.toString());
+    }
+    
+    // Show toast with level info
     toast.success(`Level ${gameLevel.id}: ${gameLevel.rule.name}`, {
-      description: gameLevel.rule.description,
+      description: description,
     });
     
     gameInitializedRef.current = true;
@@ -74,7 +85,7 @@ export const useGameInitialization = ({
         cancelAnimationFrame(gameLoopRef.current);
       }
     };
-  }, [level]);
+  }, [level, challengeMode, setTargetNumber]);
 
   return {
     getGameLevel,

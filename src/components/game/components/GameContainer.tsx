@@ -1,5 +1,4 @@
-
-import { GameStatus, GameRule } from "../types";
+import { GameStatus, Rule } from "../types";
 import { GameBoard } from "../GameBoard";
 import { GameHeader } from "./GameHeader";
 import { RuleDisplay } from "./RuleDisplay";
@@ -9,11 +8,12 @@ import { Position } from "../types";
 
 type GameContainerProps = {
   gameStatus: GameStatus;
-  currentRule: GameRule | null;
+  currentRule: Rule | null;
   level: number;
   onCellClick: (position: Position) => void;
   onNewGame: () => void;
   showGlitches: boolean;
+  targetNumber?: number;
 };
 
 export const GameContainer = ({
@@ -22,7 +22,8 @@ export const GameContainer = ({
   level,
   onCellClick,
   onNewGame,
-  showGlitches
+  showGlitches,
+  targetNumber
 }: GameContainerProps) => {
   const isMobile = useIsMobile();
 
@@ -36,7 +37,8 @@ export const GameContainer = ({
       
       <RuleDisplay 
         currentRule={currentRule} 
-        remainingNumbers={gameStatus.remainingNumbers} 
+        remainingNumbers={gameStatus.remainingNumbers}
+        targetNumber={targetNumber}
       />
       
       <GameBoard 

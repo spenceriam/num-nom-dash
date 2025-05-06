@@ -1,17 +1,19 @@
 import { useCallback, useRef, useEffect } from "react";
-import { Position, GameStatus, GameRule } from "./types";
+import { Position, GameStatus, Rule } from "./types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { getChaseMove, processMovement } from "./movementLogic";
 import { useTouchMovement } from "./useTouchMovement";
 import { useKeyboardMovement } from "./useKeyboardMovement";
 import { isPositionEqual } from "./utils";
+import { evaluateExpression } from "./utils/expressions";
 
 export type UsePlayerMovementProps = {
   gameStatus: GameStatus;
   setGameStatus: React.Dispatch<React.SetStateAction<GameStatus>>;
-  currentRule: GameRule | null;
+  currentRule: Rule | null;
   onGameOver: (score: number) => void;
   onLevelComplete?: () => void;
+  targetNumber?: number;
 };
 
 export const usePlayerMovement = ({
@@ -20,6 +22,7 @@ export const usePlayerMovement = ({
   currentRule,
   onGameOver,
   onLevelComplete,
+  targetNumber,
 }: UsePlayerMovementProps) => {
   const isMobile = useIsMobile();
   const moveIntervalRef = useRef<number>();
@@ -116,7 +119,8 @@ export const usePlayerMovement = ({
             newPos: nextPos,
             currentRule,
             onGameOver,
-            onLevelComplete
+            onLevelComplete,
+            targetNumber
           });
           stopMovement();
         }
@@ -127,7 +131,8 @@ export const usePlayerMovement = ({
             newPos: nextPos,
             currentRule,
             onGameOver,
-            onLevelComplete
+            onLevelComplete,
+            targetNumber
           });
           
           if (newState.lives < prev.lives) {
@@ -146,7 +151,14 @@ export const usePlayerMovement = ({
     };
   }, []);
 
-  useKeyboardMovement({ setGameStatus, gameStatus, currentRule, onGameOver, onLevelComplete });
+  useKeyboardMovement({ 
+    setGameStatus, 
+    gameStatus, 
+    currentRule, 
+    onGameOver, 
+    onLevelComplete,
+    targetNumber
+  });
 
   const { handleTouchStart, handleTouchEnd } = useTouchMovement({
     setGameStatus,
@@ -154,19 +166,31 @@ export const usePlayerMovement = ({
     currentRule,
     onGameOver,
     onLevelComplete,
+    targetNumber
   });
 
   const checkLevelCompletion = useCallback(() => {
     if (!currentRule) return;
     
-    const remainingCorrectNumbers = gameStatus.remainingNumbers.filter(num => 
-      currentRule.isMatch(num.value)
-    );
+    const remainingCorrectNumbers = gameStatus.remainingNumbers.filter(num => {
+      // If expression object is available, use it
+      if (num.expression) {
+        return currentRule.validate(num.expression.value, targetNumber);
+      }
+      
+      // Otherwise evaluate the string
+      try {
+        const value = evaluateExpression(num.value);
+        return currentRule.validate(value, targetNumber);
+      } catch (e) {
+        return false;
+      }
+    });
     
     if (remainingCorrectNumbers.length === 0 && gameStatus.remainingNumbers.length > 0) {
       wrappedLevelComplete();
     }
-  }, [gameStatus.remainingNumbers, currentRule, wrappedLevelComplete]);
+  }, [gameStatus.remainingNumbers, currentRule, wrappedLevelComplete, targetNumber]);
 
   const movePlayerByClick = useCallback(
     (pos: Position) => {
@@ -190,11 +214,12 @@ export const usePlayerMovement = ({
           newPos, 
           currentRule, 
           onGameOver, 
-          onLevelComplete 
+          onLevelComplete,
+          targetNumber
         })
       );
     },
-    [setGameStatus, currentRule, onGameOver, onLevelComplete]
+    [setGameStatus, currentRule, onGameOver, onLevelComplete, targetNumber]
   );
 
   return {

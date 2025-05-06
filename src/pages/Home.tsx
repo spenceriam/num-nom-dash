@@ -1,11 +1,17 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { RulesDialog } from "@/components/game/RulesDialog";
 import { levels } from "@/components/game/levels";
+import { gameRules } from "@/components/game/rules";
+import { GameType } from "@/components/game/types";
 
 const Home = () => {
+  // Get unique game types based on available rules
+  const gameTypes: GameType[] = [
+    'even', 'odd', 'prime', 'additionsOf', 'multiplesOf', 'factorsOf', 'subtractionsOf'
+  ];
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       <Card className="w-full max-w-md bg-white/80 backdrop-blur-sm shadow-lg border-2 border-[#014F86]/20">
@@ -18,12 +24,12 @@ const Home = () => {
           </div>
 
           <div className="bg-[#89C2D9]/20 p-4 rounded-lg">
-            <h2 className="font-semibold text-[#013A63] mb-2">Choose a Level</h2>
+            <h2 className="font-semibold text-[#013A63] mb-2">Choose a Game Type</h2>
             <div className="grid grid-cols-2 gap-2 mb-4">
-              {levels.map(level => (
-                <Link key={level.id} to={`/play?level=${level.id}`}>
+              {gameTypes.map((type, index) => (
+                <Link key={type} to={`/play?level=${index + 1}`}>
                   <Button className="w-full bg-[#013A63] hover:bg-[#012A4A] text-white">
-                    Play {level.rule.name}
+                    Play {gameRules[type].name}
                   </Button>
                 </Link>
               ))}

@@ -1,15 +1,16 @@
-
-import { GameStatus, Position, GameRule } from "../types";
+import { GameStatus, Position, Rule } from "../types";
 import { isPositionEqual } from "../utils";
 import { getChaseMove } from "./glitchMovement";
 import { toast } from "sonner";
+import { evaluateExpression } from "../utils/expressions";
 
 type ProcessMovementParams = {
   prev: GameStatus;
   newPos: Position;
-  currentRule: GameRule | null;
+  currentRule: Rule | null;
   onGameOver: (score: number) => void;
   onLevelComplete?: () => void;
+  targetNumber?: number;
 };
 
 export function processMovement({
@@ -18,6 +19,7 @@ export function processMovement({
   currentRule,
   onGameOver,
   onLevelComplete,
+  targetNumber,
 }: ProcessMovementParams): GameStatus {
   // Don't allow moving through walls
   if (prev.walls.some((wall) => isPositionEqual(wall, newPos))) {
@@ -36,14 +38,37 @@ export function processMovement({
 
   if (collectedNumberIndex !== -1) {
     const collectedNumber = updatedNumbers[collectedNumberIndex];
+    let isValidNumber = false;
 
-    if (currentRule && currentRule.isMatch(collectedNumber.value)) {
+    if (currentRule) {
+      // If expression object is available, use it
+      if (collectedNumber.expression) {
+        isValidNumber = currentRule.validate(collectedNumber.expression.value, targetNumber);
+      } else {
+        // Otherwise evaluate the string
+        try {
+          const value = evaluateExpression(collectedNumber.value);
+          isValidNumber = currentRule.validate(value, targetNumber);
+        } catch (e) {
+          isValidNumber = false;
+        }
+      }
+    }
+
+    if (isValidNumber) {
       score += 10;
       updatedNumbers.splice(collectedNumberIndex, 1);
       toast.success(`+10 points!`);
     } else {
       lives -= 1;
-      toast.error(`Wrong number! Rule: ${currentRule?.name || 'No rule'}`);
+      
+      // Format rule description with target number if applicable
+      let ruleDesc = currentRule?.description || 'No rule';
+      if (targetNumber !== undefined && ruleDesc.includes('[target]')) {
+        ruleDesc = ruleDesc.replace('[target]', targetNumber.toString());
+      }
+      
+      toast.error(`Wrong number! Rule: ${ruleDesc}`);
       updatedNumbers.splice(collectedNumberIndex, 1);
       
       if (lives <= 0) {
@@ -54,9 +79,20 @@ export function processMovement({
   }
 
   // Check if there are any matching numbers left to determine if glitches should chase
-  const remainingCorrectNumbers = updatedNumbers.filter((num) =>
-    currentRule?.isMatch(num.value)
-  );
+  const remainingCorrectNumbers = currentRule ? updatedNumbers.filter((num) => {
+    // If expression object is available, use it
+    if (num.expression) {
+      return currentRule.validate(num.expression.value, targetNumber);
+    }
+    
+    // Otherwise evaluate the string
+    try {
+      const value = evaluateExpression(num.value);
+      return currentRule.validate(value, targetNumber);
+    } catch (e) {
+      return false;
+    }
+  }) : [];
   
   const shouldChase = remainingCorrectNumbers.length <= 1;
 
@@ -77,8 +113,25 @@ export function processMovement({
       
       if (numberAtNewPos !== -1) {
         const consumedNumber = updatedNumbers[numberAtNewPos];
+        let isValidNumber = false;
+        
+        if (currentRule) {
+          // If expression object is available, use it
+          if (consumedNumber.expression) {
+            isValidNumber = currentRule.validate(consumedNumber.expression.value, targetNumber);
+          } else {
+            // Otherwise evaluate the string
+            try {
+              const value = evaluateExpression(consumedNumber.value);
+              isValidNumber = currentRule.validate(value, targetNumber);
+            } catch (e) {
+              isValidNumber = false;
+            }
+          }
+        }
+        
         updatedNumbers.splice(numberAtNewPos, 1);
-        if (currentRule?.isMatch(consumedNumber.value)) {
+        if (isValidNumber) {
           toast.error("A glitch consumed a matching number!");
         }
       }
@@ -88,9 +141,20 @@ export function processMovement({
   });
 
   // Check if there are any matching numbers left after glitch movement
-  const remainingCorrectNumbersAfterGlitch = updatedNumbers.filter((num) =>
-    currentRule?.isMatch(num.value)
-  );
+  const remainingCorrectNumbersAfterGlitch = currentRule ? updatedNumbers.filter((num) => {
+    // If expression object is available, use it
+    if (num.expression) {
+      return currentRule.validate(num.expression.value, targetNumber);
+    }
+    
+    // Otherwise evaluate the string
+    try {
+      const value = evaluateExpression(num.value);
+      return currentRule.validate(value, targetNumber);
+    } catch (e) {
+      return false;
+    }
+  }) : [];
 
   if (remainingCorrectNumbersAfterGlitch.length === 0 && updatedNumbers.length > 0 && currentRule) {
     onLevelComplete?.();

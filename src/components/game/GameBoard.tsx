@@ -1,6 +1,5 @@
-
 import React from "react";
-import { Position, GameRule } from "./types";
+import { Position, Rule } from "./types";
 import { GameCell } from "./components/GameCell";
 
 type GameBoardProps = {
@@ -9,7 +8,7 @@ type GameBoardProps = {
   walls: Position[];
   numbers: { position: Position; value: string }[];
   onCellClick?: (position: Position) => void;
-  currentRule: GameRule | null;
+  currentRule: Rule | null;
 };
 
 export const GameBoard = ({ 
@@ -20,10 +19,20 @@ export const GameBoard = ({
   onCellClick, 
   currentRule 
 }: GameBoardProps) => {
+  // Determine grid size based on the highest x and y values
+  const gridSize = Math.max(
+    6, // Default minimum size
+    ...numbers.map(n => Math.max(n.position.x, n.position.y)) + 1,
+    ...walls.map(w => Math.max(w.x, w.y)) + 1,
+    ...glitchPositions.map(g => Math.max(g.x, g.y)) + 1,
+    playerPosition.x + 1,
+    playerPosition.y + 1
+  );
+
   const renderGrid = () => {
     const cells = [];
-    for (let y = 0; y < 6; y++) {
-      for (let x = 0; x < 6; x++) {
+    for (let y = 0; y < gridSize; y++) {
+      for (let x = 0; x < gridSize; x++) {
         const position = { x, y };
         cells.push(
           <GameCell
@@ -44,7 +53,7 @@ export const GameBoard = ({
 
   return (
     <div className="game-board mb-4">
-      <div className="grid grid-cols-6 gap-1 p-2 bg-[#8ECAE6]/10 rounded-lg">
+      <div className={`grid grid-cols-${gridSize} gap-1 p-2 bg-[#8ECAE6]/10 rounded-lg`}>
         {renderGrid()}
       </div>
     </div>
@@ -52,4 +61,3 @@ export const GameBoard = ({
 };
 
 export default GameBoard;
-
