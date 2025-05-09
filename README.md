@@ -8,9 +8,20 @@
 [![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 
-<p align="center">
-  <img src="public/Num-Nom.png" alt="Num-Nom Character" width="150">
-</p>
+<div align="center">
+  <table border="0">
+    <tr>
+      <td><img src="public/Num-Nom.png" alt="Num-Nom Character" width="150"></td>
+      <td width="50"></td>
+      <td><img src="public/Glitch.png" alt="Glitch Character" width="150"></td>
+    </tr>
+    <tr>
+      <td align="center"><b>Num-Nom</b></td>
+      <td></td>
+      <td align="center"><b>Glitch</b></td>
+    </tr>
+  </table>
+</div>
 
 ## 📖 Overview
 
