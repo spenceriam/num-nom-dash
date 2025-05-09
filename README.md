@@ -1,73 +1,107 @@
-# Welcome to your Lovable project
+# 🎮 Num-Nom Dash
 
-## Project info
+[![Status](https://img.shields.io/badge/Status-In%20Development-yellow)](https://github.com/spenceriam/num-nom-dash)
+[![Version](https://img.shields.io/badge/Version-0.1.8-blue)](https://github.com/spenceriam/num-nom-dash/blob/main/changelog.md)
+[![License](https://img.shields.io/badge/License-MIT-green)](https://opensource.org/licenses/MIT)
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 
-**URL**: https://lovable.dev/projects/b9f54261-ed74-4771-a456-e3f9fb52ee95
+<p align="center">
+  <img src="public/Num-Nom.png" alt="Num-Nom Character" width="150">
+</p>
 
-## How can I edit this code?
+## 📖 Overview
 
-There are several ways of editing your application.
+Num-Nom Dash is an engaging educational math game where players guide the adorable Num-Nom character through a grid-based maze to collect numbers that match specific mathematical rules. Avoid the mischievous Glitches while solving mathematical challenges across 15 progressively difficult levels!
 
-**Use Lovable**
+Perfect for students, educators, and anyone looking to sharpen their math skills in a fun, interactive environment.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/b9f54261-ed74-4771-a456-e3f9fb52ee95) and start prompting.
+## ✨ Features
 
-Changes made via Lovable will be committed automatically to this repo.
+- **15 Progressive Levels**: From simple even/odd numbers to complex mathematical operations
+- **Diverse Math Challenges**: Even/odd numbers, prime numbers, addition, multiplication, factors, and subtraction
+- **Adaptive Difficulty**: Grid size and challenge complexity increase as you advance
+- **Dynamic Enemies**: Glitches with intelligent movement patterns that adapt to your level
+- **Responsive Design**: Play on desktop or mobile devices with touch/swipe support
+- **Visual Feedback**: Character mirroring, transparent backgrounds, and notifications
+- **Score Tracking**: Compete for high scores across different game modes
 
-**Use your preferred IDE**
+## 🎯 Game Mechanics
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Goal**: Collect all numbers that match the level's mathematical rule
+- **Controls**:
+  - Desktop: Arrow keys or click adjacent cells
+  - Mobile: Swipe or tap adjacent cells
+- **Lives**: 3 lives per level
+- **Scoring**: +10 points for each correct number collected
+- **Obstacles**:
+  - Glitches that appear after 5 seconds and chase you
+  - Wall obstacles in higher levels
+  - Wrong numbers that cost you a life if collected
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🔢 Level Progression
 
-Follow these steps:
+| Level | Rule Type | Description | Grid Size | Glitches |
+|-------|-----------|-------------|-----------|----------|
+| 1-3   | Basic Numbers | Even, Odd, Prime | 6×6 | 1 (Random movement) |
+| 4-6   | Addition | Sum to 10, 15, 20 | 7×7 | 1-2 (Basic chase) |
+| 7-9   | Multiplication | Multiples of 12, 16, 24 | 8×8 | 2 (Smarter pathfinding) |
+| 10-12 | Factors | Factors of 12, 16, 24 | 8×8 | 2 (Advanced chase) |
+| 13-15 | Subtraction | Difference of 5, 8, 10 | 9×9 | 3 (Smart pathfinding) |
+
+## 🧩 Characters
+
+- **Num-Nom**: The player character who loves collecting numbers
+- **Glitches**: Enemy characters that chase Num-Nom and try to consume valid numbers
+
+## 🛠️ Technology Stack
+
+- **Frontend Framework**: React 18
+- **Language**: TypeScript 5
+- **Build Tool**: Vite 5
+- **Styling**: Tailwind CSS 3
+- **UI Components**: shadcn/ui
+- **State Management**: React Hooks
+- **Notifications**: Sonner
+- **Icons**: Lucide React
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js (v16+)
+- npm or yarn
+
+### Installation
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Clone the repository
+git clone https://github.com/spenceriam/num-nom-dash.git
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Navigate to the project directory
+cd num-nom-dash
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## 📝 Development Roadmap
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Check out our [Todo List](https://github.com/spenceriam/num-nom-dash/blob/main/todo.md) to see what features are coming next!
 
-**Use GitHub Codespaces**
+## 📜 Changelog
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+View our [Changelog](https://github.com/spenceriam/num-nom-dash/blob/main/changelog.md) to track the project's evolution.
 
-## What technologies are used for this project?
+## 🤝 Contributing
 
-This project is built with:
+Contributions are welcome! Feel free to open issues or submit pull requests.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 📄 License
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/b9f54261-ed74-4771-a456-e3f9fb52ee95) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+This project is licensed under the MIT License - see the LICENSE file for details.
