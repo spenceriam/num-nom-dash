@@ -7,7 +7,7 @@ type RuleDisplayProps = {
 };
 
 export const RuleDisplay = ({ currentRule, remainingNumbers }: RuleDisplayProps) => {
-  const remainingMatchingCount = currentRule ? 
+  const remainingMatchingCount = currentRule ?
     remainingNumbers.filter(n => currentRule.isMatch(n.value)).length : 0;
 
   return (
@@ -15,7 +15,7 @@ export const RuleDisplay = ({ currentRule, remainingNumbers }: RuleDisplayProps)
       <span className="text-[#013A63] font-medium">Rule: </span>
       <span className="text-[#012A4A] font-bold">{currentRule?.name}</span>
       <div className="text-xs text-[#014F86] mt-1">
-        Remaining valid numbers: {remainingMatchingCount}
+        Remaining answers: {remainingMatchingCount}
       </div>
     </div>
   );

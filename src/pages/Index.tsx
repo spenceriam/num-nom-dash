@@ -33,6 +33,8 @@ const Index = () => {
   useEffect(() => {
     if (levelParam) {
       setCurrentLevel(parseInt(levelParam, 10));
+      // Start the game immediately when a level is selected
+      setGameState("playing");
     }
   }, [levelParam]);
 

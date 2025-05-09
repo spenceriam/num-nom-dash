@@ -33,31 +33,39 @@ export const GameCell = ({
   const glitchDirection = glitchIndex !== -1 && glitchDirections[glitchIndex] ? glitchDirections[glitchIndex] : "right";
   const number = numbers.find(num => isPositionEqual(num.position, position));
 
-  const renderGlitchIcon = () => (
-    <img
-      src="/Glitch.png"
-      alt="Glitch"
-      className="w-full h-full object-contain scale-150"
-      style={{
-        imageRendering: 'pixelated',
-        transform: glitchDirection === "left" ? 'scaleX(-1)' : 'none'
-      }}
-    />
-  );
+  const renderGlitchIcon = () => {
+    return (
+      <div className="absolute inset-0 flex items-center justify-center">
+        <img
+          src="/Glitch.png"
+          alt="Glitch"
+          className="w-3/4 h-3/4 object-contain"
+          style={{
+            imageRendering: 'pixelated',
+            transform: glitchDirection === "left" ? 'scaleX(-1)' : 'none'
+          }}
+        />
+      </div>
+    );
+  };
 
-  const renderPlayerIcon = () => (
-    <div className="w-full h-full bg-[#219EBC] rounded-full flex items-center justify-center">
-      <img
-        src="/Num-Nom.png"
-        alt="NumNom"
-        className="w-full h-full object-contain scale-125"
-        style={{
-          imageRendering: 'pixelated',
-          transform: playerDirection === "left" ? 'scaleX(-1)' : 'none'
-        }}
-      />
-    </div>
-  );
+  const renderPlayerIcon = () => {
+    return (
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="bg-[#219EBC] rounded-full w-full h-full flex items-center justify-center">
+          <img
+            src="/Num-Nom.png"
+            alt="NumNom"
+            className="w-3/4 h-3/4 object-contain"
+            style={{
+              imageRendering: 'pixelated',
+              transform: playerDirection === "left" ? 'scaleX(-1)' : 'none'
+            }}
+          />
+        </div>
+      </div>
+    );
+  };
 
   // Determine cell size based on grid size
   const currentLevel = window.location.search.includes('challenge') ?
@@ -73,7 +81,7 @@ export const GameCell = ({
                   gridSize <= 8 ? "w-10 h-10" :
                   "w-9 h-9";
 
-  let cellClass = `${cellSize} border border-[#014F86]/20 flex items-center justify-center rounded transition-all`;
+  let cellClass = `${cellSize} border border-[#014F86]/20 relative flex items-center justify-center rounded transition-all`;
 
   if (isPlayer) {
     cellClass += " bg-[#219EBC] text-white";
@@ -82,10 +90,8 @@ export const GameCell = ({
   } else if (isGlitch) {
     cellClass += " bg-[#8ECAE6]/20";
   } else if (number) {
-    const isMatching = currentRule?.isMatch(number.value);
-    cellClass += isMatching
-      ? " bg-[#8ECAE6]/30 hover:bg-[#8ECAE6]/50"
-      : " bg-[#FB8500]/20 hover:bg-[#FB8500]/40";
+    // Use the same background color for all number cells
+    cellClass += " bg-[#8ECAE6]/30 hover:bg-[#8ECAE6]/50";
   } else {
     cellClass += " bg-white/30 hover:bg-white/50";
   }
@@ -97,12 +103,12 @@ export const GameCell = ({
     >
       {isPlayer && renderPlayerIcon()}
       {isGlitch && renderGlitchIcon()}
-      {number && !isPlayer && !isGlitch && (
+      {number && !isPlayer && (
         <span className={`font-mono text-[#012A4A] font-bold ${
           gridSize <= 6 ? 'text-lg' :
           gridSize <= 8 ? 'text-base' :
           'text-sm'
-        }`}>
+        } ${isGlitch ? 'opacity-0' : ''}`}>
           {number.value}
         </span>
       )}

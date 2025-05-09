@@ -101,15 +101,21 @@ export function generateEasyMaze(
   // Initialize the numbers array
   const numbers: { position: Position; value: string }[] = [];
 
-  // Create a list of all grid positions except player, glitch, and wall positions
+  // Create a list of all grid positions except player and wall positions
+  // Include glitch positions so they can have numbers too
   const allPositions: Position[] = [];
+  const glitchPositions: Position[] = [];
+
   for (let y = 0; y < gridSize; y++) {
     for (let x = 0; x < gridSize; x++) {
       const pos = { x, y };
-      if (!isPositionEqual(pos, playerStart) &&
-          !glitches.some(g => isPositionEqual(g, pos)) &&
-          !walls.some(w => isPositionEqual(w, pos))) {
-        allPositions.push(pos);
+      if (!isPositionEqual(pos, playerStart) && !walls.some(w => isPositionEqual(w, pos))) {
+        // Check if this is a glitch position
+        if (glitches.some(g => isPositionEqual(g, pos))) {
+          glitchPositions.push(pos);
+        } else {
+          allPositions.push(pos);
+        }
       }
     }
   }
@@ -194,6 +200,95 @@ export function generateEasyMaze(
 
     numbers.push({ position, value });
     ruleMatchingAdded++;
+  }
+
+  // Now add numbers to glitch positions (randomly matching or non-matching)
+  for (const position of glitchPositions) {
+    let value: string;
+    // 50% chance of being a matching number
+    const shouldMatch = Math.random() < 0.5;
+
+    if (shouldMatch) {
+      // Generate a matching value using the same logic as above
+      if (useExpressions) {
+        if (target) {
+          if (ruleStr.includes("addition")) {
+            value = generateExpressionEqualsTo(target, 'addition');
+          } else if (ruleStr.includes("subtraction")) {
+            value = generateExpressionEqualsTo(target, 'subtraction');
+          } else if (ruleStr.includes("multiple")) {
+            value = generateExpressionEqualsTo(target, 'multiplication');
+          } else if (ruleStr.includes("factor")) {
+            const factors = [];
+            for (let i = 1; i <= target; i++) {
+              if (target % i === 0) factors.push(i);
+            }
+            value = factors[Math.floor(Math.random() * factors.length)].toString();
+          } else {
+            value = generateExpressionEqualsTo(target);
+          }
+        } else {
+          value = generateExpressionEqualsTo(10);
+        }
+      } else {
+        if (ruleStr.includes("evens")) {
+          value = (getRandomNumber(1, 10) * 2).toString();
+        } else if (ruleStr.includes("odds")) {
+          value = (getRandomNumber(0, 9) * 2 + 1).toString();
+        } else if (ruleStr.includes("prime")) {
+          const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29];
+          value = primes[Math.floor(Math.random() * primes.length)].toString();
+        } else if (ruleStr.includes("factor") && target) {
+          const factors = [];
+          for (let i = 1; i <= target; i++) {
+            if (target % i === 0) factors.push(i);
+          }
+          value = factors[Math.floor(Math.random() * factors.length)].toString();
+        } else {
+          value = getRandomNumber(1, 20).toString();
+        }
+      }
+    } else {
+      // Generate a non-matching value
+      if (useExpressions) {
+        if (target) {
+          if (ruleStr.includes("addition")) {
+            value = generateNonMatchingExpression(target, 'addition');
+          } else if (ruleStr.includes("subtraction")) {
+            value = generateNonMatchingExpression(target, 'subtraction');
+          } else if (ruleStr.includes("multiple")) {
+            value = generateNonMatchingExpression(target, 'multiplication');
+          } else {
+            value = generateNonMatchingExpression(target);
+          }
+        } else {
+          value = generateNonMatchingExpression(10);
+        }
+      } else {
+        if (ruleStr.includes("evens")) {
+          value = (getRandomNumber(0, 9) * 2 + 1).toString(); // Odd numbers
+        } else if (ruleStr.includes("odds")) {
+          value = (getRandomNumber(1, 10) * 2).toString(); // Even numbers
+        } else if (ruleStr.includes("prime")) {
+          let num;
+          const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29];
+          do {
+            num = getRandomNumber(4, 30);
+          } while (primes.includes(num));
+          value = num.toString();
+        } else if (ruleStr.includes("factor") && target) {
+          let num;
+          do {
+            num = getRandomNumber(2, target * 2);
+          } while (target % num === 0);
+          value = num.toString();
+        } else {
+          value = getRandomNumber(1, 20).toString();
+        }
+      }
+    }
+
+    numbers.push({ position, value });
   }
 
   // Fill remaining positions with non-matching values

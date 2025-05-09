@@ -23,9 +23,15 @@ Date: 2025-05-05
 
 ## 2. Visual Improvements (HIGH PRIORITY)
 
-*Awaiting user input on specific visual issues*
-
-- [ ] Review current UI/UX flow
+- [x] Replace character images with transparent background versions
+- [x] Add character mirroring when moving left
+- [x] Add delay before Glitches appear at the start of each level
+- [x] Simplify main menu with consistent game type buttons
+- [x] Streamline game flow by removing welcome screen
+- [x] Remove visual hints from game board (same background for all number cells)
+- [x] Change "Remaining valid numbers" to "Remaining answers"
+- [x] Fix glitch starting positions to have numbers instead of being empty
+- [x] Fix Glitch character positioning to be properly centered in cells
 - [ ] Ensure mobile-first responsive design
 - [ ] Maintain consistent game board size across devices
 - [ ] Improve visual feedback for game events (collection, errors)
