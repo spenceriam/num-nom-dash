@@ -11,6 +11,8 @@ type UseGameInitializationProps = {
   setGameStatus: (status: GameStatus | ((prev: GameStatus) => GameStatus)) => void;
   onUpdateGameStatus?: (status: Partial<GameStatus>) => void;
   gameStatus: GameStatus;
+  setShowGlitches?: (show: boolean) => void;
+  startGlitchMovement?: () => void;
 };
 
 export const useGameInitialization = ({
@@ -20,6 +22,8 @@ export const useGameInitialization = ({
   setGameStatus,
   onUpdateGameStatus,
   gameStatus,
+  setShowGlitches,
+  startGlitchMovement,
 }: UseGameInitializationProps) => {
   const gameInitializedRef = useRef(false);
   const challengeLevelRef = useRef(1);
@@ -31,7 +35,7 @@ export const useGameInitialization = ({
       const baseLevel = levels[levelIndex];
       const cycleCount = Math.floor((challengeLevelRef.current - 1) / levels.length);
       const difficultyMultiplier = 1 + (cycleCount * 0.2);
-      
+
       return {
         ...baseLevel,
         id: challengeLevelRef.current,
@@ -44,10 +48,10 @@ export const useGameInitialization = ({
 
   useEffect(() => {
     if (gameInitializedRef.current) return;
-    
+
     const gameLevel = getGameLevel();
     if (!gameLevel) return;
-    
+
     setCurrentRule(gameLevel.rule);
     const initialGameStatus = {
       score: gameStatus.score,
@@ -55,20 +59,31 @@ export const useGameInitialization = ({
       level,
       playerPosition: gameLevel.maze.playerStart,
       playerStart: gameLevel.maze.playerStart,
+      playerDirection: "right",
       glitchPositions: gameLevel.maze.glitches,
+      glitchDirections: gameLevel.maze.glitches.map(() => "right"),
       remainingNumbers: gameLevel.maze.numbers,
       walls: gameLevel.maze.walls
     };
-    
+
     setGameStatus(initialGameStatus);
     onUpdateGameStatus?.(initialGameStatus);
-    
+
     toast.success(`Level ${gameLevel.id}: ${gameLevel.rule.name}`, {
       description: gameLevel.rule.description,
     });
-    
+
+    // Enable glitches after a 5-second delay
+    setTimeout(() => {
+      setShowGlitches?.(true);
+      startGlitchMovement?.();
+      toast.info("Glitches have appeared!", {
+        description: "Watch out for the Glitches!",
+      });
+    }, 5000);
+
     gameInitializedRef.current = true;
-    
+
     return () => {
       if (gameLoopRef.current) {
         cancelAnimationFrame(gameLoopRef.current);

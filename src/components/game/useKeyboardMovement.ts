@@ -57,6 +57,8 @@ export function useKeyboardMovement({
       if (direction) {
         setGameStatus((prev) => {
           let newPos = { ...prev.playerPosition };
+          let newDirection = prev.playerDirection;
+
           switch (direction) {
             case "up":
               newPos.y = Math.max(0, newPos.y - 1);
@@ -66,18 +68,26 @@ export function useKeyboardMovement({
               break;
             case "left":
               newPos.x = Math.max(0, newPos.x - 1);
+              newDirection = "left";
               break;
             case "right":
               newPos.x = Math.min(5, newPos.x + 1);
+              newDirection = "right";
               break;
           }
-          return processMovement({ 
-            prev, 
-            newPos, 
-            currentRule, 
+
+          const newState = processMovement({
+            prev,
+            newPos,
+            currentRule,
             onGameOver,
-            onLevelComplete 
+            onLevelComplete
           });
+
+          return {
+            ...newState,
+            playerDirection: newDirection
+          };
         });
         e.preventDefault();
       } else if (diagonal) {
@@ -87,12 +97,12 @@ export function useKeyboardMovement({
             x: Math.max(0, Math.min(5, playerPosition.x + diagonal!.dx)),
             y: Math.max(0, Math.min(5, playerPosition.y + diagonal!.dy)),
           };
-          return processMovement({ 
-            prev, 
-            newPos, 
-            currentRule, 
+          return processMovement({
+            prev,
+            newPos,
+            currentRule,
             onGameOver,
-            onLevelComplete 
+            onLevelComplete
           });
         });
         e.preventDefault();

@@ -13,7 +13,7 @@ const Index = () => {
   const [searchParams] = useSearchParams();
   const levelParam = searchParams.get('level');
   const mode = searchParams.get('mode');
-  
+
   const [gameState, setGameState] = useState<GameState>("starting");
   const [score, setScore] = useState(0);
   const [currentLevel, setCurrentLevel] = useState(1);
@@ -23,7 +23,9 @@ const Index = () => {
     level: 1,
     playerPosition: { x: 0, y: 0 },
     playerStart: { x: 0, y: 0 },
+    playerDirection: "right",
     glitchPositions: [],
+    glitchDirections: [],
     remainingNumbers: [],
     walls: []
   });
@@ -59,8 +61,8 @@ const Index = () => {
           <StartScreen onStart={startGame} levelName={levels[currentLevel - 1]?.rule.name || "Challenge"} />
         )}
         {gameState === "playing" && (
-          <Game 
-            onGameOver={endGame} 
+          <Game
+            onGameOver={endGame}
             level={currentLevel}
             onUpdateGameStatus={updateGameStatus}
             challengeMode={mode === "challenge"}

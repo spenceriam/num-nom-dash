@@ -44,7 +44,9 @@ export type GameStatus = {
   level: number;
   playerPosition: Position;
   playerStart: Position; // Add this property to store the starting position
+  playerDirection: Direction; // Track player's facing direction
   glitchPositions: Position[];
+  glitchDirections: Direction[]; // Track each glitch's facing direction
   remainingNumbers: { position: Position; value: string }[]; // Updated from number to string
   walls: Position[];
 };

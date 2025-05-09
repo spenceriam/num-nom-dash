@@ -28,27 +28,29 @@ export const GameContainer = ({
 
   return (
     <div className="game-container relative bg-white/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border-2 border-[#014F86]/20">
-      <GameHeader 
-        level={level} 
-        lives={gameStatus.lives} 
-        score={gameStatus.score} 
+      <GameHeader
+        level={level}
+        lives={gameStatus.lives}
+        score={gameStatus.score}
       />
-      
-      <RuleDisplay 
-        currentRule={currentRule} 
-        remainingNumbers={gameStatus.remainingNumbers} 
+
+      <RuleDisplay
+        currentRule={currentRule}
+        remainingNumbers={gameStatus.remainingNumbers}
       />
-      
-      <GameBoard 
+
+      <GameBoard
         playerPosition={gameStatus.playerPosition}
+        playerDirection={gameStatus.playerDirection}
         glitchPositions={showGlitches ? gameStatus.glitchPositions : []}
+        glitchDirections={gameStatus.glitchDirections}
         walls={gameStatus.walls}
         numbers={gameStatus.remainingNumbers}
         onCellClick={onCellClick}
         currentRule={currentRule}
       />
 
-      <GameFooter 
+      <GameFooter
         onNewGame={onNewGame}
         isMobile={isMobile}
       />

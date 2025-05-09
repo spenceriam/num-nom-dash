@@ -36,15 +36,6 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus, challengeMo
     challengeMode
   });
 
-  const { getGameLevel, challengeLevelRef } = useGameInitialization({
-    level,
-    challengeMode,
-    setCurrentRule,
-    setGameStatus,
-    onUpdateGameStatus,
-    gameStatus
-  });
-
   const {
     movePlayerByClick,
     startGlitchMovement,
@@ -60,10 +51,24 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus, challengeMo
     },
   });
 
+  const { getGameLevel, challengeLevelRef } = useGameInitialization({
+    level,
+    challengeMode,
+    setCurrentRule,
+    setGameStatus,
+    onUpdateGameStatus,
+    gameStatus,
+    setShowGlitches,
+    startGlitchMovement
+  });
+
   const handleLevelComplete = () => {
+    // Reset glitches visibility for the new level
+    setShowGlitches(false);
+
     if (challengeMode) {
       challengeLevelRef.current += 1;
-      
+
       if (challengeLevelRef.current > challengeLevelLimit) {
         onGameOver(gameStatus.score);
       } else {
@@ -77,7 +82,7 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus, challengeMo
       setShowLevelComplete(false);
     }
   };
-  
+
   const handleNewGame = () => {
     navigate("/");
   };
@@ -97,7 +102,7 @@ const Game = ({ onGameOver, level: initialLevel, onUpdateGameStatus, challengeMo
         showGlitches={showGlitches}
       />
 
-      <LevelCompleteDialog 
+      <LevelCompleteDialog
         show={showLevelComplete}
         onOpenChange={setShowLevelComplete}
         onComplete={handleLevelComplete}

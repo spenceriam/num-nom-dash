@@ -29,7 +29,7 @@ export const usePlayerMovement = ({
   const getNextPosition = (current: Position, target: Position): Position => {
     const dx = target.x - current.x;
     const dy = target.y - current.y;
-    
+
     if (Math.abs(dx) > Math.abs(dy)) {
       return {
         x: current.x + Math.sign(dx),
@@ -54,19 +54,31 @@ export const usePlayerMovement = ({
 
   const moveGlitches = useCallback(() => {
     setGameStatus(prev => {
-      const newGlitchPositions = prev.glitchPositions.map(glitch => {
+      const newGlitchPositions = [];
+      const newGlitchDirections = [...(prev.glitchDirections || [])];
+
+      prev.glitchPositions.forEach((glitch, index) => {
         const nextGlitchPos = getChaseMove(
-          glitch, 
-          prev.playerPosition, 
+          glitch,
+          prev.playerPosition,
           prev.walls,
           prev.remainingNumbers.length
         );
-        return nextGlitchPos;
+
+        // Update direction based on movement
+        if (nextGlitchPos.x < glitch.x) {
+          newGlitchDirections[index] = "left";
+        } else if (nextGlitchPos.x > glitch.x) {
+          newGlitchDirections[index] = "right";
+        }
+
+        newGlitchPositions.push(nextGlitchPos);
       });
 
       return {
         ...prev,
-        glitchPositions: newGlitchPositions
+        glitchPositions: newGlitchPositions,
+        glitchDirections: newGlitchDirections
       };
     });
   }, [setGameStatus]);
@@ -83,10 +95,11 @@ export const usePlayerMovement = ({
     glitchIntervalRef.current = window.setInterval(moveGlitches, 1560);
   }, [moveGlitches, stopGlitchMovement]);
 
+  // We'll let the Game component control when to start glitch movement
+  // This will be triggered after the delay when glitches become visible
   useEffect(() => {
-    startGlitchMovement();
     return () => stopGlitchMovement();
-  }, [gameStatus.level, startGlitchMovement, stopGlitchMovement]);
+  }, [stopGlitchMovement]);
 
   const wrappedLevelComplete = useCallback(() => {
     stopGlitchMovement();
@@ -102,17 +115,32 @@ export const usePlayerMovement = ({
     moveIntervalRef.current = window.setInterval(() => {
       setGameStatus(prev => {
         const nextPos = getNextPosition(prev.playerPosition, target);
-        
+
         if (prev.walls.some(wall => isPositionEqual(wall, nextPos))) {
           stopMovement();
           return prev;
         }
-        
-        let newState = { ...prev, playerPosition: nextPos };
-        
+
+        // Update player direction based on horizontal movement
+        let playerDirection = prev.playerDirection;
+        if (nextPos.x < prev.playerPosition.x) {
+          playerDirection = "left";
+        } else if (nextPos.x > prev.playerPosition.x) {
+          playerDirection = "right";
+        }
+
+        let newState = {
+          ...prev,
+          playerPosition: nextPos,
+          playerDirection: playerDirection
+        };
+
         if (isPositionEqual(nextPos, target)) {
           newState = processMovement({
-            prev,
+            prev: {
+              ...prev,
+              playerDirection: playerDirection
+            },
             newPos: nextPos,
             currentRule,
             onGameOver,
@@ -120,21 +148,24 @@ export const usePlayerMovement = ({
           });
           stopMovement();
         }
-        
+
         if (prev.glitchPositions.some(g => isPositionEqual(g, nextPos))) {
           newState = processMovement({
-            prev,
+            prev: {
+              ...prev,
+              playerDirection: playerDirection
+            },
             newPos: nextPos,
             currentRule,
             onGameOver,
             onLevelComplete
           });
-          
+
           if (newState.lives < prev.lives) {
             stopMovement();
           }
         }
-        
+
         return newState;
       });
     }, 300);
@@ -158,11 +189,11 @@ export const usePlayerMovement = ({
 
   const checkLevelCompletion = useCallback(() => {
     if (!currentRule) return;
-    
-    const remainingCorrectNumbers = gameStatus.remainingNumbers.filter(num => 
+
+    const remainingCorrectNumbers = gameStatus.remainingNumbers.filter(num =>
       currentRule.isMatch(num.value)
     );
-    
+
     if (remainingCorrectNumbers.length === 0 && gameStatus.remainingNumbers.length > 0) {
       wrappedLevelComplete();
     }
@@ -171,12 +202,12 @@ export const usePlayerMovement = ({
   const movePlayerByClick = useCallback(
     (pos: Position) => {
       const { walls, glitchPositions } = gameStatus;
-      
-      if (walls.some(wall => isPositionEqual(wall, pos)) || 
+
+      if (walls.some(wall => isPositionEqual(wall, pos)) ||
           glitchPositions.some(g => isPositionEqual(g, pos))) {
         return;
       }
-      
+
       startMovement(pos);
     },
     [gameStatus, currentRule, onGameOver, onLevelComplete]
@@ -185,12 +216,12 @@ export const usePlayerMovement = ({
   const handleMove = useCallback(
     (newPos: Position) => {
       setGameStatus((prev) =>
-        processMovement({ 
-          prev, 
-          newPos, 
-          currentRule, 
-          onGameOver, 
-          onLevelComplete 
+        processMovement({
+          prev,
+          newPos,
+          currentRule,
+          onGameOver,
+          onLevelComplete
         })
       );
     },

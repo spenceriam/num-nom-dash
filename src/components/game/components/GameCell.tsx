@@ -1,22 +1,26 @@
 
 import React from "react";
-import { Position, GameRule } from "../types";
+import { Position, GameRule, Direction } from "../types";
 import { isPositionEqual } from "../utils";
 
 type GameCellProps = {
   position: Position;
   playerPosition: Position;
+  playerDirection?: Direction;
   glitchPositions: Position[];
+  glitchDirections?: Direction[];
   walls: Position[];
   numbers: { position: Position; value: string }[];
   currentRule: GameRule | null;
   onCellClick?: (position: Position) => void;
 };
 
-export const GameCell = ({ 
+export const GameCell = ({
   position,
   playerPosition,
+  playerDirection = "right", // Default direction is right
   glitchPositions,
+  glitchDirections = [],
   walls,
   numbers,
   currentRule,
@@ -25,34 +29,52 @@ export const GameCell = ({
   const isPlayer = isPositionEqual(position, playerPosition);
   const isWall = walls.some(wall => isPositionEqual(wall, position));
   const isGlitch = glitchPositions.some(glitch => isPositionEqual(glitch, position));
+  const glitchIndex = glitchPositions.findIndex(glitch => isPositionEqual(glitch, position));
+  const glitchDirection = glitchIndex !== -1 && glitchDirections[glitchIndex] ? glitchDirections[glitchIndex] : "right";
   const number = numbers.find(num => isPositionEqual(num.position, position));
 
   const renderGlitchIcon = () => (
-    <img 
-      src="/lovable-uploads/e1c8cb26-e716-48a2-8acc-4f9491e7f75d.png" 
-      alt="Glitch" 
-      className="w-full h-full object-contain scale-150" 
+    <img
+      src="/Glitch.png"
+      alt="Glitch"
+      className="w-full h-full object-contain scale-150"
       style={{
-        imageRendering: 'pixelated'
+        imageRendering: 'pixelated',
+        transform: glitchDirection === "left" ? 'scaleX(-1)' : 'none'
       }}
     />
   );
 
   const renderPlayerIcon = () => (
     <div className="w-full h-full bg-[#219EBC] rounded-full flex items-center justify-center">
-      <img 
-        src="/lovable-uploads/ce72a35c-6820-4164-ba07-21851bf30984.png" 
-        alt="NumNom" 
-        className="w-full h-full object-contain scale-150" 
+      <img
+        src="/Num-Nom.png"
+        alt="NumNom"
+        className="w-full h-full object-contain scale-125"
         style={{
-          imageRendering: 'pixelated'
+          imageRendering: 'pixelated',
+          transform: playerDirection === "left" ? 'scaleX(-1)' : 'none'
         }}
       />
     </div>
   );
 
-  let cellClass = "w-12 h-12 border border-[#014F86]/20 flex items-center justify-center rounded transition-all";
-  
+  // Determine cell size based on grid size
+  const currentLevel = window.location.search.includes('challenge') ?
+    parseInt(localStorage.getItem('challengeLevel') || '1', 10) :
+    parseInt(new URLSearchParams(window.location.search).get('level') || '1', 10);
+
+  const gridSize = currentLevel <= 3 ? 6 : // Small grid for early levels
+                  currentLevel <= 6 ? 7 : // Medium grid for mid levels
+                  currentLevel <= 10 ? 8 : // Larger grid for later levels
+                  9; // Largest grid for advanced levels
+
+  const cellSize = gridSize <= 6 ? "w-12 h-12" :
+                  gridSize <= 8 ? "w-10 h-10" :
+                  "w-9 h-9";
+
+  let cellClass = `${cellSize} border border-[#014F86]/20 flex items-center justify-center rounded transition-all`;
+
   if (isPlayer) {
     cellClass += " bg-[#219EBC] text-white";
   } else if (isWall) {
@@ -61,22 +83,26 @@ export const GameCell = ({
     cellClass += " bg-[#8ECAE6]/20";
   } else if (number) {
     const isMatching = currentRule?.isMatch(number.value);
-    cellClass += isMatching 
-      ? " bg-[#8ECAE6]/30 hover:bg-[#8ECAE6]/50" 
+    cellClass += isMatching
+      ? " bg-[#8ECAE6]/30 hover:bg-[#8ECAE6]/50"
       : " bg-[#FB8500]/20 hover:bg-[#FB8500]/40";
   } else {
     cellClass += " bg-white/30 hover:bg-white/50";
   }
 
   return (
-    <div 
+    <div
       className={cellClass}
       onClick={() => onCellClick?.(position)}
     >
       {isPlayer && renderPlayerIcon()}
       {isGlitch && renderGlitchIcon()}
       {number && !isPlayer && !isGlitch && (
-        <span className="font-mono text-[#012A4A] font-bold text-lg">
+        <span className={`font-mono text-[#012A4A] font-bold ${
+          gridSize <= 6 ? 'text-lg' :
+          gridSize <= 8 ? 'text-base' :
+          'text-sm'
+        }`}>
           {number.value}
         </span>
       )}

@@ -45,7 +45,7 @@ export function processMovement({
       lives -= 1;
       toast.error(`Wrong number! Rule: ${currentRule?.name || 'No rule'}`);
       updatedNumbers.splice(collectedNumberIndex, 1);
-      
+
       if (lives <= 0) {
         onGameOver(score);
         return prev;
@@ -57,24 +57,24 @@ export function processMovement({
   const remainingCorrectNumbers = updatedNumbers.filter((num) =>
     currentRule?.isMatch(num.value)
   );
-  
+
   const shouldChase = remainingCorrectNumbers.length <= 1;
 
   // Move all glitches and let them consume numbers
   let updatedGlitchPositions = prev.glitchPositions.map(glitch => {
     const newGlitchPos = getChaseMove(
-      glitch, 
-      playerPosition, 
+      glitch,
+      playerPosition,
       prev.walls,
       shouldChase ? 1 : updatedNumbers.length
     );
 
     // Increased random chance (now 80%) to attempt consuming a number
     if (Math.random() < 0.8) {
-      const numberAtNewPos = updatedNumbers.findIndex(num => 
+      const numberAtNewPos = updatedNumbers.findIndex(num =>
         isPositionEqual(num.position, newGlitchPos)
       );
-      
+
       if (numberAtNewPos !== -1) {
         const consumedNumber = updatedNumbers[numberAtNewPos];
         updatedNumbers.splice(numberAtNewPos, 1);
@@ -83,7 +83,7 @@ export function processMovement({
         }
       }
     }
-    
+
     return newGlitchPos;
   });
 
@@ -116,12 +116,24 @@ export function processMovement({
     }
   }
 
+  // Update glitch directions based on movement
+  const updatedGlitchDirections = [...(prev.glitchDirections || [])];
+  updatedGlitchPositions.forEach((newPos, index) => {
+    const oldPos = prev.glitchPositions[index];
+    if (newPos.x < oldPos.x) {
+      updatedGlitchDirections[index] = "left";
+    } else if (newPos.x > oldPos.x) {
+      updatedGlitchDirections[index] = "right";
+    }
+  });
+
   return {
     ...prev,
     playerPosition,
     score,
     lives,
     remainingNumbers: updatedNumbers,
-    glitchPositions: updatedGlitchPositions
+    glitchPositions: updatedGlitchPositions,
+    glitchDirections: updatedGlitchDirections
   };
 }

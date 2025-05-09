@@ -12,10 +12,10 @@ type UseGameStateProps = {
 const INITIAL_LIVES = 3;
 const MAX_CHALLENGE_LEVEL = 50;
 
-export const useGameState = ({ 
-  initialLevel, 
-  onUpdateGameStatus, 
-  challengeMode = false 
+export const useGameState = ({
+  initialLevel,
+  onUpdateGameStatus,
+  challengeMode = false
 }: UseGameStateProps) => {
   const [level, setLevel] = useState(initialLevel);
   const [showLevelComplete, setShowLevelComplete] = useState(false);
@@ -26,12 +26,14 @@ export const useGameState = ({
     level,
     playerPosition: { x: 0, y: 0 },
     playerStart: { x: 0, y: 0 },
+    playerDirection: "right",
     glitchPositions: [],
+    glitchDirections: [],
     remainingNumbers: [],
     walls: []
   });
   const [currentRule, setCurrentRule] = useState<GameRule | null>(null);
-  
+
   return {
     level,
     setLevel,

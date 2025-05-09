@@ -40,11 +40,15 @@ export function useTouchMovement({
 
     setGameStatus((prev) => {
       let newPos = { ...prev.playerPosition };
+      let newDirection = prev.playerDirection;
+
       if (Math.abs(dx) > Math.abs(dy)) {
         if (dx > 50) {
           newPos.x = Math.min(5, newPos.x + 1);
+          newDirection = "right";
         } else if (dx < -50) {
           newPos.x = Math.max(0, newPos.x - 1);
+          newDirection = "left";
         }
       } else {
         if (dy > 50) {
@@ -53,13 +57,19 @@ export function useTouchMovement({
           newPos.y = Math.max(0, newPos.y - 1);
         }
       }
-      return processMovement({
+
+      const newState = processMovement({
         prev,
         newPos,
         currentRule,
         onGameOver,
         onLevelComplete,
       });
+
+      return {
+        ...newState,
+        playerDirection: newDirection
+      };
     });
 
     touchStartRef.current = null;
